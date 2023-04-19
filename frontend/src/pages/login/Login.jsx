@@ -33,7 +33,7 @@ const Login = () => {
       <Card
         style={{
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "500px",
         }}
       >
         <Form
@@ -44,21 +44,28 @@ const Login = () => {
         >
           <Form.Item
             name="username"
-            rules={[{ required: true, message: "Please input your Username!" }]}
+            rules={[
+              { required: true, message: "Veuillez renseigner votre pseudo!" },
+            ]}
           >
             <Input
               prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Username"
+              placeholder="Pseudo"
             />
           </Form.Item>
           <Form.Item
             name="password"
-            rules={[{ required: true, message: "Please input your Password!" }]}
+            rules={[
+              {
+                required: true,
+                message: "Veuillez renseigner votre mot de passe!",
+              },
+            ]}
           >
             <Input
               prefix={<LockOutlined className="site-form-item-icon" />}
               type="password"
-              placeholder="Password"
+              placeholder="Mot de passe"
             />
           </Form.Item>
           <Content
@@ -74,15 +81,15 @@ const Login = () => {
               htmlType="submit"
               className="login-form-button"
             >
-              Log in
+              Se connecter
             </Button>
             <Content
               style={{
                 width: "100%",
               }}
             >
-              <Text>Or </Text>
-              <Link onClick={() => navigate("/register")}>register now!</Link>
+              <Text>Ou </Text>
+              <Link onClick={() => navigate("/register")}>inscrivez vous!</Link>
             </Content>
           </Content>
         </Form>

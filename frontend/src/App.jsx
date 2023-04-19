@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import logo from "./assets/logo.png";
 import {
@@ -14,6 +14,10 @@ import {
   HomeOutlined,
   SearchOutlined,
   BookOutlined,
+  HeartOutlined,
+  HeartFilled,
+  BookFilled,
+  HomeFilled,
 } from "@ant-design/icons";
 import {
   Button,
@@ -27,7 +31,12 @@ import {
 } from "antd";
 import Timer from "./components/player/timer/Timer.jsx";
 import Player from "./components/player/Player.jsx";
-import { useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import Login from "./pages/login/Login.jsx";
+import Bibliotheque from "./pages/bibliotheque/Bibliotheque.jsx";
+import Likes from "./pages/likes/Likes.jsx";
+import Rechercher from "./pages/rechercher/Rechercher.jsx";
+import Accueil from "./pages/accueil/Accueil.jsx";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -37,12 +46,18 @@ function App() {
   const [selectedKey, setSelectedKey] = useState("0");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const navigate = useNavigate();
+  const checkToken = (element) => {
+    if (!localStorage.getItem("token")) {
+      return <Login />;
+    }
+    return element;
+  };
 
   const items = [
     {
       key: "0",
       url: "/",
-      icon: <HomeOutlined />,
+      icon: selectedKey === "0" ? <HomeFilled /> : <HomeOutlined />,
       label: "Accueil",
     },
     {
@@ -54,8 +69,14 @@ function App() {
     {
       key: "2",
       url: "bibliotheque",
-      icon: <BookOutlined />,
+      icon: selectedKey === "2" ? <BookFilled /> : <BookOutlined />,
       label: "Bibliothèque",
+    },
+    {
+      key: "3",
+      url: "likes",
+      icon: selectedKey === "3" ? <HeartFilled /> : <HeartOutlined />,
+      label: "Titres likés",
     },
   ];
   return (
@@ -120,7 +141,14 @@ function App() {
             </div>
           </Sider>
           <Layout className="site-layout">
-            <Content></Content>
+            <Content>
+              <Routes>
+                <Route path="/bibliotheque" element={<Bibliotheque />} />
+                <Route path="/likes" element={<Likes />} />
+                <Route path="/rechercher" element={<Rechercher />} />
+                <Route path="/" element={<Accueil />} />
+              </Routes>
+            </Content>
           </Layout>
         </Layout>
         <Footer

@@ -14,7 +14,9 @@ import {
   Select,
   Space,
 } from "antd";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const { Text, Link } = Typography;
 
@@ -23,6 +25,7 @@ const Register = () => {
   const onFinish = (values) => {
     console.log("Received values of form: ", values);
   };
+  const navigate = useNavigate();
 
   return (
     <Layout
@@ -37,7 +40,7 @@ const Register = () => {
       <Card
         style={{
           width: "100%",
-          maxWidth: "600px",
+          maxWidth: "500px",
         }}
       >
         <Form
@@ -57,15 +60,15 @@ const Register = () => {
             rules={[
               {
                 type: "email",
-                message: "The input is not valid E-mail!",
+                message: "L'adresse e-mail n'est pas valide!",
               },
               {
                 required: true,
-                message: "Please input your E-mail!",
+                message: "Veuillez saisir votre adresse e-mail!",
               },
             ]}
           >
-            <Input placeholder={"E-mail"} />
+            <Input prefix={<MailOutlined />} placeholder={"Adresse e-mail"} />
           </Form.Item>
 
           <Form.Item
@@ -73,7 +76,7 @@ const Register = () => {
             rules={[
               {
                 required: true,
-                message: "Please input your password!",
+                message: "Veuillez saisir votre mot de passe!",
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
@@ -90,7 +93,10 @@ const Register = () => {
             ]}
             hasFeedback
           >
-            <Input.Password placeholder="Mot de passe" />
+            <Input.Password
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              placeholder="Mot de passe"
+            />
           </Form.Item>
 
           <Form.Item
@@ -116,7 +122,10 @@ const Register = () => {
               }),
             ]}
           >
-            <Input.Password placeholder={"Confirmer le mot de passe"} />
+            <Input.Password
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              placeholder={"Confirmer le mot de passe"}
+            />
           </Form.Item>
 
           <Form.Item
@@ -129,7 +138,10 @@ const Register = () => {
               },
             ]}
           >
-            <Input placeholder="Pseudo" />
+            <Input
+              prefix={<UserOutlined className="site-form-item-icon" />}
+              placeholder="Pseudo"
+            />
           </Form.Item>
           <Button type="primary" htmlType="submit">
             S'inscrire
@@ -141,7 +153,7 @@ const Register = () => {
                 navigate("/login");
               }}
             >
-              se conecter
+              connectez vous!
             </Link>
           </Space>
         </Form>

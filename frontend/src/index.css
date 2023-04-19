@@ -1,8 +1,9 @@
-
-
 body {
   margin: 0;
   display: flex;
   padding: 0;
 }
-
+* {
+  -webkit-user-select: none;
+  user-select: none;
+}
