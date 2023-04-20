@@ -19,7 +19,7 @@ load_dotenv()
 
 
 router = APIRouter()
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
+client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("MONGODB_URL"))
 db = client.dlisfy
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

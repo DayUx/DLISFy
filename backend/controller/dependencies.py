@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from jose import JWTError, jwt
 
 load_dotenv()
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
+client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("MONGODB_URL"))
 db = client.dlisfy
 
 

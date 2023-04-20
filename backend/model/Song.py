@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, EmailStr
-import PyObjectId
+from backend.model.PyObjectId import PyObjectId
 from bson import ObjectId
 from typing import Optional, List
 

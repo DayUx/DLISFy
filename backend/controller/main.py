@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends
 
 from . import dependencies
-from internal import admin
-from routers import auth, music
+from .internal import admin
+from .routers import auth, music
 
 app = FastAPI()
 app.include_router(

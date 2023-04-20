@@ -3,7 +3,7 @@ from typing import Optional
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
-import PyObjectId
+from backend.model.PyObjectId import PyObjectId
 
 
 class StyleModel(BaseModel):

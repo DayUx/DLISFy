@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, Field, EmailStr
-import PyObjectId
+from backend.model.PyObjectId import PyObjectId
 from bson import ObjectId
 from typing import Optional, List
 from passlib.context import CryptContext

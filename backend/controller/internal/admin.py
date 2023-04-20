@@ -4,9 +4,10 @@ from fastapi import APIRouter,status,HTTPException
 
 from backend.model.Style import StyleModel
 import motor.motor_asyncio
-
+from dotenv import load_dotenv
+load_dotenv()
 router = APIRouter()
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
+client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("MONGODB_URL"))
 db = client.dlisfy
 
 
