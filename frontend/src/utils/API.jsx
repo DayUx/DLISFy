@@ -9,4 +9,7 @@ export const API = {
   searchMusiques: API_URL + "music/song/search",
   createMusique: API_URL + "admin/song",
   updateMusique: API_URL + "admin/song",
+  searchStyles: API_URL + "music/style/search",
+  createStyle: API_URL + "admin/style",
+  updateStyle: API_URL + "admin/style",
 };

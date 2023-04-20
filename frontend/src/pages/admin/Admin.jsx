@@ -31,6 +31,7 @@ import Accueil from "../accueil/Accueil.jsx";
 import Player from "../../components/player/Player.jsx";
 import ArtistesCRUD from "../crud/ArtistesCRUD/ArtistesCRUD.jsx";
 import MusiquesCRUD from "../crud/MusiquesCRUD/MusiquesCRUD.jsx";
+import StylesCRUD from "../crud/StylesCRUD/StylesCRUD.jsx";
 
 const { Sider, Header, Content, Footer } = Layout;
 const { Text, Title, Link } = Typography;
@@ -162,6 +163,7 @@ const Admin = () => {
                 <Route path="/albums" element={<div>albums</div>} />
                 <Route path="/artistes" element={<ArtistesCRUD />} />
                 <Route path="/musiques" element={<MusiquesCRUD />} />
+                <Route path="/styles" element={<StylesCRUD />} />
               </Routes>
             </Content>
           </Layout>

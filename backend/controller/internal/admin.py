@@ -3,6 +3,7 @@ import os
 from bson import ObjectId
 from fastapi import APIRouter,status,HTTPException
 
+from backend.model.Album import AlbumModel
 from backend.model.Artist import ArtistModel
 from backend.model.Song import SongModel
 from backend.model.Style import StyleModel
@@ -44,3 +45,42 @@ async def addSong(song: SongModel):
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song added")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not added")
+
+@router.put("/song/{song_id}", )
+async def updateSong(song_id:str, song: SongModel):
+    try:
+        await db.song.update_one({"_id": ObjectId(song_id)}, {"$set": song.dict()})
+        return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song updated")
+    except:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not updated")
+
+@router.post("/album", )
+async def addAlbum(album: AlbumModel):
+    try:
+        await db.album.insert_one(album.dict())
+        return HTTPException(status_code=status.HTTP_201_CREATED, detail="Album added")
+    except:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Album not added")
+
+@router.put("/album/{album_id}", )
+async def updateAlbum(album_id:str, album: AlbumModel):
+    try:
+        await db.album.update_one({"_id": ObjectId(album_id)}, {"$set": album.dict()})
+        return HTTPException(status_code=status.HTTP_201_CREATED, detail="Album updated")
+    except:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Album not updated")
+@router.post("/style", )
+async def addStyle(style: StyleModel):
+    try:
+        await db.style.insert_one(style.dict())
+        return HTTPException(status_code=status.HTTP_201_CREATED, detail="Style added")
+    except:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not added")
+@router.put("/style/{style_id}", )
+async def updateStyle(style_id:str, style: StyleModel):
+    try:
+        await db.style.update_one({"_id": ObjectId(style_id)}, {"$set": style.dict()})
+        return HTTPException(status_code=status.HTTP_201_CREATED, detail="Style updated")
+    except:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not updated")
+

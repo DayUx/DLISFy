@@ -136,3 +136,11 @@ async def getAlbumsByStyle(style_id:str):
         return album
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Album not found")
+@router.get("/style/search/{style_name}", response_model=list[StyleModel])
+async def searchStyles(style_name:str):
+    try:
+        style = [doc async for doc in db.style.find({"name": {"$regex": style_name}})]
+        return style
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not found")

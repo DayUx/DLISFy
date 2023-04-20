@@ -31,6 +31,7 @@ const MusiquesCRUD = () => {
   const [loading, setUploading] = useState(false);
   const [musiques, setMusiques] = useState([]);
   const [artistes, setArtistes] = useState([]);
+  const [styles, setStyles] = useState([]);
   const searchRef = useRef(null);
   const [selectedArtiste, setSelectedArtiste] = useState([]);
   const [music, setMusic] = useState([]);
@@ -51,6 +52,24 @@ const MusiquesCRUD = () => {
       if (res.ok) {
         res.json().then((data) => {
           setArtistes(data);
+        });
+      } else {
+        notification.error({
+          message: "Erreur",
+          description: "Une erreur est survenue",
+        });
+      }
+    });
+    fetch(API.searchStyles + "/" + ".*", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Token": localStorage.getItem("access_token"),
+      },
+    }).then((res) => {
+      if (res.ok) {
+        res.json().then((data) => {
+          setStyles(data);
         });
       } else {
         notification.error({
@@ -410,10 +429,10 @@ const MusiquesCRUD = () => {
               filterOption={(input, option) =>
                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
-              options={artistes.map((artist) => {
+              options={styles.map((style) => {
                 return {
-                  label: artist.name,
-                  value: artist._id,
+                  label: style.name,
+                  value: style._id,
                 };
               })}
             ></Select>
