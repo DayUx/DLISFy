@@ -13,19 +13,53 @@ import {
   Typography,
   Select,
   Space,
+  notification,
 } from "antd";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
+import { API } from "../../utils/API.jsx";
 const { Option } = Select;
 const { Text, Link } = Typography;
 
 const Register = () => {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
+
   const onFinish = (values) => {
     console.log("Received values of form: ", values);
+    fetch(API.register, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+        username: values.username,
+      }),
+    }).then((r) => {
+      if (r.ok) {
+        r.json().then((data) => {
+          notification.success({
+            message: "Succès",
+            description: "Vous êtes maintenant inscrit!",
+            duration: 3,
+          });
+          localStorage.setItem("access_token", data.access_token);
+          navigate("/");
+        });
+      } else {
+        r.json().then((data) => {
+          notification.error({
+            message: "Erreur",
+            description: data.detail,
+            duration: 3,
+          });
+        });
+      }
+    });
   };
-  const navigate = useNavigate();
 
   return (
     <Layout
@@ -80,7 +114,7 @@ const Register = () => {
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (value.length < 12) {
+                  if (value?.length < 12) {
                     return Promise.reject(
                       new Error(
                         "Le mot de passe doit contenir au moins 12 caractères!"
@@ -129,7 +163,7 @@ const Register = () => {
           </Form.Item>
 
           <Form.Item
-            name="pseudo"
+            name="username"
             rules={[
               {
                 required: true,

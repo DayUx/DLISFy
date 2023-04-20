@@ -12,10 +12,8 @@ from backend.model.Artist import ArtistModel
 from backend.model.Song import SongModel
 from backend.model.Style import StyleModel
 import motor.motor_asyncio
-from dotenv import load_dotenv
 from jose import JWTError, jwt
 
-load_dotenv()
 
 
 router = APIRouter()
@@ -63,6 +61,14 @@ async def getArtistsByStyle(style_id:str):
         return artist
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Artist not found")
+@router.get("/artist/search/{artist_name}", response_model=list[ArtistModel])
+async def searchArtists(artist_name:str):
+    try:
+        artist = [doc async for doc in db.artist.find({"name": {"$regex": artist_name}})]
+        return artist
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Artist not found")
 
 @router.get("/song/{page_number}", response_model=list[SongModel])
 async def getSongs(page_number:int):
@@ -92,6 +98,15 @@ async def getSongsByStyle(style_id:str):
         return song
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not found")
+@router.get("/song/search/{song_name}", response_model=list[SongModel])
+async def searchSongs(song_name:str):
+    try:
+        song = [doc async for doc in db.song.find({"name": {"$regex": song_name}})]
+        return song
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not found")
+
 @router.get("/album/{page_number}", response_model=list[AlbumModel])
 async def getAlbums(page_number:int):
     try:

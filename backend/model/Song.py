@@ -9,8 +9,7 @@ class SongModel(BaseModel):
     artists: list = Field(default_factory=list)
     album: str = Field(...)
     duration: int = Field(...)
-    rate: int = Field(...)
-    data: list = Field(default_factory=list)
+    data: str = Field(...)
     numberPlay: int = Field(...)
     styles: list = Field(default_factory=list)
     image: str = Field(...)
@@ -37,8 +36,7 @@ class UpdateSongModel(BaseModel):
     artists:Optional[list]
     album:Optional[str]
     duration:Optional[int]
-    rate:Optional[int]
-    data:Optional[list]
+    data: str = Field(...)
     numberPlay:Optional[int]
     styles:Optional[list]
     image: str = Field(...)
@@ -54,7 +52,6 @@ class UpdateSongModel(BaseModel):
                 "album": "Album 1",
                 "image": Field(...),
                 "duration": 120,
-                "rate": 5,
                 "data": ["5d12d1f", "d12fd1f5", "5d5fd1f2"],
                 "numberPlay": 0,
                 "styles": ["sddsd4VSDvd", "sdvds5vsdv22"]

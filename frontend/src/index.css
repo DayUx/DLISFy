@@ -7,3 +7,14 @@ body {
   -webkit-user-select: none;
   user-select: none;
 }
+
+:root {
+  --border: 1px solid rgba(150, 150, 150, 0.2);
+}
+.hover-opacity {
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+.hover-opacity:hover {
+  opacity: 0.7;
+}

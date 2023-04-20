@@ -7,10 +7,17 @@ import Admin from "./pages/admin/Admin.jsx";
 import Register from "./pages/register/Register.jsx";
 import Login from "./pages/login/Login.jsx";
 
+const checkIfLoggedIn = () => {
+  if (localStorage.getItem("access_token")) {
+    return true;
+  }
+  return false;
+};
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Routes>
-      <Route path="/admin" element={<Admin />} />
+      <Route path="/admin/*" element={<Admin />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/*" element={<App />} />

@@ -1,10 +1,19 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 
 from . import dependencies
 from .internal import admin
 from .routers import auth, music
-
+from dotenv import load_dotenv,find_dotenv
+load_dotenv(find_dotenv())
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(
     admin.router,
     prefix="/admin",

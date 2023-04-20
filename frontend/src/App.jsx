@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import logo from "./assets/logo.png";
 import {
@@ -24,6 +24,7 @@ import {
   ConfigProvider,
   Layout,
   Menu,
+  notification,
   Space,
   Switch,
   theme,
@@ -46,6 +47,16 @@ function App() {
   const [selectedKey, setSelectedKey] = useState("0");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!localStorage.getItem("access_token")) {
+      notification.error({
+        message: "Erreur",
+        description: "Veuillez vous connecter",
+      });
+      navigate("/login");
+    }
+  });
   const checkToken = (element) => {
     if (!localStorage.getItem("token")) {
       return <Login />;

@@ -19,7 +19,7 @@ class TokenData(BaseModel):
 class UserModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     username: str = Field(...)
-    email: EmailStr = Field(...)
+    email: str = Field(...)
     password: str = Field(...)
     likes: list = Field(default_factory=list)
     playlists: list = Field(default_factory=list)
@@ -40,7 +40,7 @@ class UserModel(BaseModel):
         }
 class UpdateUserModel(BaseModel):
     username:Optional[str]
-    email:Optional[EmailStr]
+    email:Optional[str]
     password:Optional[str]
     likes:Optional[list]
     playlists:Optional[list]

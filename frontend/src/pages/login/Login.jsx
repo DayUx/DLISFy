@@ -9,8 +9,10 @@ import {
   Layout,
   Typography,
   Space,
+  notification,
 } from "antd";
 import { useNavigate } from "react-router-dom";
+import { API } from "../../utils/API.jsx";
 
 const { Content } = Layout;
 const { Text, Link } = Typography;
@@ -18,7 +20,31 @@ const { Text, Link } = Typography;
 const Login = () => {
   const navigate = useNavigate();
   const onFinish = (values) => {
-    console.log("Received values of form: ", values);
+    fetch(API.login, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password,
+      }),
+    }).then((r) => {
+      if (r.ok) {
+        r.json().then((data) => {
+          localStorage.setItem("access_token", data.access_token);
+          navigate("/");
+        });
+      } else {
+        r.json().then((data) => {
+          notification.error({
+            message: "Erreur",
+            description: data.detail,
+            duration: 3,
+          });
+        });
+      }
+    });
   };
   return (
     <Layout
