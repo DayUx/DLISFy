@@ -1,13 +1,18 @@
+import base64
 import os
 
+import motor.motor_asyncio
 from bson import ObjectId
-from fastapi import APIRouter,status,HTTPException
+from fastapi import APIRouter, status, HTTPException
+from mutagen.wave import WAVE
+from mutagen.mp3 import MP3
+from mutagen.wave import WAVE
 
 from backend.model.Album import AlbumModel
 from backend.model.Artist import ArtistModel
 from backend.model.Song import SongModel
 from backend.model.Style import StyleModel
-import motor.motor_asyncio
+
 router = APIRouter()
 client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("MONGODB_URL"))
 db = client.dlisfy
@@ -40,10 +45,38 @@ async def updateArtist(artist_id:str, artist: ArtistModel):
 
 @router.post("/song", )
 async def addSong(song: SongModel):
+    if len(song.data.strip()) == 0:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Veuillez ajouter un fichier audio")
+    if len(song.title.strip()) == 0:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Veuillez ajouter un titre")
+    if len(song.image.strip()) == 0:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Veuillez ajouter une image")
     try:
+        # get base64 audio file duration
+        # decode base64 audio file
+
+        # remove start of base64 to base64,
+        # indexComma = song.data.find(",")
+        # song.data = song.data[indexComma + 1:]
+        decoded_data = base64.b64decode(song.data, ' /')
+        # get audio file duration
+
+
+        # save audio file
+        file = open("temp", "wb")
+        file.write(decoded_data)
+
+        if song.type == "audio/wav":
+            audio = WAVE("temp")
+        if song.type == "audio/mp3":
+            audio = MP3("temp")
+
+        song.duration = audio.info.length
+
         await db.song.insert_one(song.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song added")
-    except:
+    except Exception as e:
+        print(e)
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not added")
 
 @router.put("/song/{song_id}", )

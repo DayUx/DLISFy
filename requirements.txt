@@ -8,3 +8,6 @@ python-dotenv==1.0.0
 python-jose~=3.3.0
 uvicorn==0.21.1
 bcrypt==4.0.1
+
+mutagen~=1.46.0
+audioread~=3.0.0

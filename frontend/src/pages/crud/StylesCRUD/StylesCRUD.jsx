@@ -23,6 +23,7 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import { API } from "../../../utils/API.jsx";
+import { get, post, put } from "../../../utils/CustomRequests.jsx";
 const { Footer, Content } = Layout;
 const { Search } = Input;
 const { Text } = Typography;
@@ -30,91 +31,34 @@ const StylesCRUD = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setUploading] = useState(false);
   const [styles, setStyles] = useState([]);
-  const [artistes, setArtistes] = useState([]);
   const searchRef = useRef(null);
-  const [selectedArtiste, setSelectedArtiste] = useState([]);
-  const [music, setMusic] = useState([]);
-  const handleChange = (info) => {
-    if (info.file.status === "uploading") {
-      setUploading(true);
-    }
-  };
+
   useEffect(() => {
     onSearch(".*");
-    fetch(API.searchArtistes + "/" + ".*", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
-      },
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          setArtistes(data);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
-    });
   }, []);
 
   const onFinish = (values) => {
-    fetch(API.createStyle, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
-      },
-      body: JSON.stringify({
+    post(API.createStyle, {
+      body: {
         name: values.name,
-      }),
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          notification.success({
-            message: "Succès",
-            description: "Le style a bien été créé",
-          });
-          onSearch(searchRef.current.input.value);
-          setImageUrl("");
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
+      },
+      success: (data) => {
+        onSearch(searchRef.current.input.value);
+        setImageUrl("");
+      },
+      successMessage: "Le style a bien été créé",
     });
   };
 
   const updateStyle = (style) => {
-    fetch(API.updateStyle + "/" + style._id, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
-      },
-      body: JSON.stringify({
+    put(API.updateStyle + "/" + style._id, {
+      body: {
         name: style.name,
-      }),
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          notification.success({
-            message: "Succès",
-            description: "Le style a bien été modifié",
-          });
-          onSearch(searchRef.current.input.value);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
+      },
+      success: (data) => {
+        onSearch(searchRef.current.input.value);
+      },
+      successMessage: "Le style a bien été modifié",
     });
   };
 
@@ -122,23 +66,10 @@ const StylesCRUD = () => {
     if (!value) {
       value = ".*";
     }
-    fetch(API.searchStyles + "/" + value, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
+    get(API.searchStyles + "/" + value, {
+      success: (data) => {
+        setStyles(data);
       },
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          setStyles(data);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
     });
   };
   return (

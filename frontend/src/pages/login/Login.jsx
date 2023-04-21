@@ -13,6 +13,7 @@ import {
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import { API } from "../../utils/API.jsx";
+import { post } from "../../utils/CustomRequests.jsx";
 
 const { Content } = Layout;
 const { Text, Link } = Typography;
@@ -20,30 +21,15 @@ const { Text, Link } = Typography;
 const Login = () => {
   const navigate = useNavigate();
   const onFinish = (values) => {
-    fetch(API.login, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    post(API.login, {
+      body: {
         username: values.username,
         password: values.password,
-      }),
-    }).then((r) => {
-      if (r.ok) {
-        r.json().then((data) => {
-          localStorage.setItem("access_token", data.access_token);
-          navigate("/");
-        });
-      } else {
-        r.json().then((data) => {
-          notification.error({
-            message: "Erreur",
-            description: data.detail,
-            duration: 3,
-          });
-        });
-      }
+      },
+      success: (data) => {
+        localStorage.setItem("access_token", data.access_token);
+        navigate("/");
+      },
     });
   };
   return (

@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from backend.model.Album import AlbumModel
 from backend.model.Artist import ArtistModel
-from backend.model.Song import SongModel
+from backend.model.Song import SongModel,SongModelLite
 from backend.model.Style import StyleModel
 import motor.motor_asyncio
 from jose import JWTError, jwt
@@ -98,10 +98,10 @@ async def getSongsByStyle(style_id:str):
         return song
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not found")
-@router.get("/song/search/{song_name}", response_model=list[SongModel])
+@router.get("/song/search/{song_name}", response_model=list[SongModelLite])
 async def searchSongs(song_name:str):
     try:
-        song = [doc async for doc in db.song.find({"name": {"$regex": song_name}})]
+        song = [doc async for doc in db.song.find({"title": {"$regex": song_name}},{"data":0})]
         return song
     except Exception as e:
         print(e)

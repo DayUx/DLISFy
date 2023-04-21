@@ -32,6 +32,7 @@ import Player from "../../components/player/Player.jsx";
 import ArtistesCRUD from "../crud/ArtistesCRUD/ArtistesCRUD.jsx";
 import MusiquesCRUD from "../crud/MusiquesCRUD/MusiquesCRUD.jsx";
 import StylesCRUD from "../crud/StylesCRUD/StylesCRUD.jsx";
+import { get } from "../../utils/CustomRequests.jsx";
 
 const { Sider, Header, Content, Footer } = Layout;
 const { Text, Title, Link } = Typography;
@@ -68,26 +69,9 @@ const Admin = () => {
     if (!localStorage.getItem("access_token")) {
       navigate("/login");
     }
-    fetch(API.admin, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "x-token": localStorage.getItem("access_token"),
-      },
-    }).then((r) => {
-      if (r.ok) {
-        r.json().then((data) => {
-          console.log(data);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Vous n'êtes pas autorisé à accéder à cette page",
-        });
-        navigate("/");
-      }
-    });
+    get(API.admin);
   }, []);
+
   const onFinish = (values) => {
     console.log("Received values of form: ", values);
   };

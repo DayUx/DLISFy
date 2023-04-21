@@ -20,6 +20,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { API } from "../../../utils/API.jsx";
+import { get, post, put } from "../../../utils/CustomRequests.jsx";
 const { Footer, Content } = Layout;
 const { Search } = Input;
 const { Text } = Typography;
@@ -39,61 +40,29 @@ const ArtistesCRUD = () => {
   }, []);
 
   const onFinish = (values) => {
-    fetch(API.createArtiste, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
-      },
-      body: JSON.stringify({
+    post(API.createArtiste, {
+      body: {
         image: imageUrl,
         name: values.name,
-      }),
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          notification.success({
-            message: "Succès",
-            description: "L'artiste a bien été créé",
-          });
-          onSearch(searchRef.current.input.value);
-          setImageUrl("");
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
+      },
+      success: (data) => {
+        onSearch(searchRef.current.input.value);
+        setImageUrl("");
+      },
+      successMessage: "L'artiste a bien été créé",
     });
   };
 
   const updateArtiste = (artiste) => {
-    fetch(API.updateArtiste + "/" + artiste._id, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
-      },
-      body: JSON.stringify({
+    put(API.updateArtiste + "/" + artiste._id, {
+      body: {
         name: artiste.name,
         image: artiste.image,
-      }),
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          notification.success({
-            message: "Succès",
-            description: "L'artiste a bien été modifié",
-          });
-          onSearch(searchRef.current.input.value);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
+      },
+      success: (data) => {
+        onSearch(searchRef.current.input.value);
+      },
+      successMessage: "L'artiste a bien été modifié",
     });
   };
 
@@ -101,23 +70,10 @@ const ArtistesCRUD = () => {
     if (!value) {
       value = ".*";
     }
-    fetch(API.searchArtistes + "/" + value, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
+    get(API.searchArtistes + "/" + value, {
+      success: (data) => {
+        setArtistes(data);
       },
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          setArtistes(data);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
     });
   };
   return (

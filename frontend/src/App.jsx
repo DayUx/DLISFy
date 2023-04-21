@@ -32,7 +32,7 @@ import {
 } from "antd";
 import Timer from "./components/player/timer/Timer.jsx";
 import Player from "./components/player/Player.jsx";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Login from "./pages/login/Login.jsx";
 import Bibliotheque from "./pages/bibliotheque/Bibliotheque.jsx";
 import Likes from "./pages/likes/Likes.jsx";
@@ -46,7 +46,8 @@ function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("0");
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const navigate = useNavigate();
+  history.navigate = useNavigate();
+  history.location = useLocation();
 
   useEffect(() => {
     if (!localStorage.getItem("access_token")) {
@@ -54,7 +55,7 @@ function App() {
         message: "Erreur",
         description: "Veuillez vous connecter",
       });
-      navigate("/login");
+      history.navigate("/login");
     }
   });
   const checkToken = (element) => {
@@ -131,7 +132,7 @@ function App() {
                   defaultSelectedKeys={["1"]}
                   selectedKeys={[selectedKey]}
                   onSelect={(e) => (
-                    setSelectedKey(e.key), navigate(e.item.props.url)
+                    setSelectedKey(e.key), history.navigate(e.item.props.url)
                   )}
                   items={items}
                 />

@@ -15,7 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=1440
 
 async def isAdmin(x_token: str = Header("X-Token")):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=status.HTTP_403_FORBIDDEN,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )

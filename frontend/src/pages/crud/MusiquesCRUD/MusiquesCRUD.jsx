@@ -23,6 +23,7 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import { API } from "../../../utils/API.jsx";
+import { get, post, put } from "../../../utils/CustomRequests.jsx";
 const { Footer, Content } = Layout;
 const { Search } = Input;
 const { Text } = Typography;
@@ -42,100 +43,54 @@ const MusiquesCRUD = () => {
   };
   useEffect(() => {
     onSearch(".*");
-    fetch(API.searchArtistes + "/" + ".*", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
+    get(API.searchArtistes + "/" + ".*", {
+      success: (data) => {
+        setArtistes(data);
       },
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          setArtistes(data);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
     });
-    fetch(API.searchStyles + "/" + ".*", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
+    get(API.searchStyles + "/" + ".*", {
+      success: (data) => {
+        setStyles(data);
       },
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          setStyles(data);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
     });
   }, []);
 
   const onFinish = (values) => {
-    fetch(API.createMusique, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
-      },
-      body: JSON.stringify({
-        image: imageUrl,
-        name: values.name,
-      }),
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          notification.success({
-            message: "Succès",
-            description: "L'musique a bien été créé",
-          });
+    const reader = new FileReader();
+    reader.readAsDataURL(music[0]);
+    reader.onload = () => {
+      post(API.createMusique, {
+        body: {
+          image: imageUrl,
+          title: values.title,
+          artists: values.artists,
+          styles: values.styles,
+          album: values.album,
+          data: reader.result,
+        },
+        success: (data) => {
           onSearch(searchRef.current.input.value);
           setImageUrl("");
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
-    });
+        },
+        successMessage: "La musique a bien été créé",
+      });
+    };
   };
 
   const updateMusique = (musique) => {
-    fetch(API.updateMusique + "/" + musique._id, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
-      },
-      body: JSON.stringify({
-        name: musique.title,
+    put(API.updateMusique + "/" + musique._id, {
+      body: {
         image: musique.image,
-      }),
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          notification.success({
-            message: "Succès",
-            description: "L'musique a bien été modifié",
-          });
-          onSearch(searchRef.current.input.value);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
+        title: musique.title,
+        artists: musique.artists,
+        styles: musique.styles,
+        album: musique.album,
+        data: musique.data,
+      },
+      success: (data) => {
+        onSearch(searchRef.current.input.value);
+      },
+      successMessage: "La musique a bien été modifiée",
     });
   };
 
@@ -143,23 +98,10 @@ const MusiquesCRUD = () => {
     if (!value) {
       value = ".*";
     }
-    fetch(API.searchMusiques + "/" + value, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token": localStorage.getItem("access_token"),
+    get(API.searchMusiques + "/" + value, {
+      success: (data) => {
+        setMusiques(data);
       },
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          setMusiques(data);
-        });
-      } else {
-        notification.error({
-          message: "Erreur",
-          description: "Une erreur est survenue",
-        });
-      }
     });
   };
   return (
@@ -268,6 +210,46 @@ const MusiquesCRUD = () => {
                     >
                       {musique.title}
                     </Text>
+                    <Upload
+                      showUploadList={false}
+                      beforeUpload={(file) => {
+                        console.log(file);
+                        //verify that type is audio
+                        if (
+                          file.type !== "audio/mpeg" &&
+                          file.type !== "audio/mp3" &&
+                          file.type !== "audio/wav" &&
+                          file.type !== "audio/ogg"
+                        ) {
+                          notification.error({
+                            message: "Erreur",
+                            description:
+                              "Le fichier doit être au format .mpeg, .mp3, .wav ou .ogg",
+                          });
+                          return false;
+                        }
+                        if (file.size / 1024 / 1024 > 5) {
+                          notification.error({
+                            message: "Erreur",
+                            description: "Le fichier ne doit pas dépasser 5Mo",
+                          });
+                          return false;
+                        }
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = () => {
+                          musique.data = reader.result;
+                          updateMusique(musique);
+                        };
+                        return false;
+                      }}
+                    >
+                      <Button
+                        shape={"circle"}
+                        icon={<UploadOutlined />}
+                      ></Button>
+                    </Upload>
+                    <audio controls={true} src={musique.data}></audio>
                   </Space>
                 </Content>
               </Card>
@@ -326,10 +308,10 @@ const MusiquesCRUD = () => {
                 });
                 return false;
               }
-              if (file.size / 1024 / 1024 > 3) {
+              if (file.size / 1024 / 1024 > 5) {
                 notification.error({
                   message: "Erreur",
-                  description: "Le fichier ne doit pas dépasser 3Mo",
+                  description: "Le fichier ne doit pas dépasser 5Mo",
                 });
                 return false;
               }
@@ -421,7 +403,15 @@ const MusiquesCRUD = () => {
               })}
             ></Select>
           </Form.Item>
-          <Form.Item name={"styles"}>
+          <Form.Item
+            name={"styles"}
+            rules={[
+              {
+                required: true,
+                message: "Veuillez choisir au moins un style",
+              },
+            ]}
+          >
             <Select
               mode="multiple"
               style={{ width: "100%" }}
