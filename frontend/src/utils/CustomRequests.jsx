@@ -1,5 +1,5 @@
 import { notification } from "antd";
-import { history } from "./_helper.jsx";
+import { utils } from "./_helper.jsx";
 
 const customRequest = (
   url,
@@ -54,7 +54,7 @@ const verifyCode = (code, data, showNotification) => {
       });
     }
 
-    history.navigate("/login");
+    utils.navigate("/login");
     return false;
   }
   if (code === 403) {
@@ -65,7 +65,7 @@ const verifyCode = (code, data, showNotification) => {
         description: "Vous n'avez pas les droits nécessaires!",
       });
     }
-    history.navigate("/");
+    utils.navigate("/");
     return false;
   }
   if (code >= 400) {
@@ -118,6 +118,28 @@ export const put = (
     url,
     "PUT",
     parameters.body,
+    parameters.success,
+    parameters.failure,
+    parameters.failureMessage,
+    parameters.successMessage,
+    parameters.showFailureNotification
+  );
+};
+
+export const del = (
+  url,
+  parameters = {
+    success: function () {},
+    failure: function () {},
+    failureMessage: null,
+    successMessage: null,
+    showFailureNotification: true,
+  }
+) => {
+  customRequest(
+    url,
+    "DELETE",
+    {},
     parameters.success,
     parameters.failure,
     parameters.failureMessage,

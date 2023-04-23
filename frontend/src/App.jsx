@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
 import logo from "./assets/logo.png";
 import {
@@ -38,6 +38,7 @@ import Bibliotheque from "./pages/bibliotheque/Bibliotheque.jsx";
 import Likes from "./pages/likes/Likes.jsx";
 import Rechercher from "./pages/rechercher/Rechercher.jsx";
 import Accueil from "./pages/accueil/Accueil.jsx";
+import { utils } from "./utils/_helper.jsx";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -46,8 +47,12 @@ function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("0");
   const [isDarkMode, setIsDarkMode] = useState(false);
-  history.navigate = useNavigate();
-  history.location = useLocation();
+  utils.navigate = useNavigate();
+  utils.location = useLocation();
+  const playerRef = useRef();
+  useEffect(() => {
+    utils.player = playerRef;
+  }, [playerRef]);
 
   useEffect(() => {
     if (!localStorage.getItem("access_token")) {
@@ -55,7 +60,7 @@ function App() {
         message: "Erreur",
         description: "Veuillez vous connecter",
       });
-      history.navigate("/login");
+      utils.navigate("/login");
     }
   });
   const checkToken = (element) => {
@@ -132,7 +137,7 @@ function App() {
                   defaultSelectedKeys={["1"]}
                   selectedKeys={[selectedKey]}
                   onSelect={(e) => (
-                    setSelectedKey(e.key), history.navigate(e.item.props.url)
+                    setSelectedKey(e.key), utils.navigate(e.item.props.url)
                   )}
                   items={items}
                 />
@@ -166,9 +171,10 @@ function App() {
         <Footer
           style={{
             padding: "10px 20px",
+            borderTop: "var(--border)",
           }}
         >
-          <Player></Player>
+          <Player ref={playerRef}></Player>
         </Footer>
       </Layout>
     </ConfigProvider>

@@ -10,7 +10,7 @@ from mutagen.wave import WAVE
 
 from backend.model.Album import AlbumModel
 from backend.model.Artist import ArtistModel
-from backend.model.Song import SongModel
+from backend.model.Song import SongModel, UpdateSongModel
 from backend.model.Style import StyleModel
 
 router = APIRouter()
@@ -65,10 +65,10 @@ async def addSong(song: SongModel):
         # save audio file
         file = open("temp", "wb")
         file.write(decoded_data)
-
+        audio = None
         if song.type == "audio/wav":
             audio = WAVE("temp")
-        if song.type == "audio/mp3":
+        if song.type == "audio/mp3" or song.type == "audio/mpeg":
             audio = MP3("temp")
 
         song.duration = audio.info.length
@@ -79,13 +79,21 @@ async def addSong(song: SongModel):
         print(e)
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not added")
 
+
 @router.put("/song/{song_id}", )
-async def updateSong(song_id:str, song: SongModel):
+async def updateSong(song_id:str, song: UpdateSongModel):
     try:
         await db.song.update_one({"_id": ObjectId(song_id)}, {"$set": song.dict()})
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song updated")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not updated")
+@router.delete("/song/{song_id}", )
+async def deleteSong(song_id:str):
+    try:
+        await db.song.delete_one({"_id": ObjectId(song_id)})
+        return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song deleted")
+    except:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not deleted")
 
 @router.post("/album", )
 async def addAlbum(album: AlbumModel):

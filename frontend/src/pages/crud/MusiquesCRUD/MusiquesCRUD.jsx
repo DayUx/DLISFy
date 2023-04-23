@@ -15,10 +15,12 @@ import {
 
 import React, { useEffect, useRef, useState } from "react";
 import {
+  CaretRightOutlined,
   CloseOutlined,
   CodepenOutlined,
   EditOutlined,
   LoadingOutlined,
+  PauseOutlined,
   PlusOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
@@ -33,9 +35,12 @@ const MusiquesCRUD = () => {
   const [musiques, setMusiques] = useState([]);
   const [artistes, setArtistes] = useState([]);
   const [styles, setStyles] = useState([]);
+  const [playingId, setPlayingId] = useState(null);
+  const [playingData, setPlayingData] = useState(null);
   const searchRef = useRef(null);
   const [selectedArtiste, setSelectedArtiste] = useState([]);
   const [music, setMusic] = useState([]);
+  const audioRef = useRef(null);
   const handleChange = (info) => {
     if (info.file.status === "uploading") {
       setUploading(true);
@@ -67,6 +72,7 @@ const MusiquesCRUD = () => {
           styles: values.styles,
           album: values.album,
           data: reader.result,
+          type: music[0].type,
         },
         success: (data) => {
           onSearch(searchRef.current.input.value);
@@ -86,6 +92,7 @@ const MusiquesCRUD = () => {
         styles: musique.styles,
         album: musique.album,
         data: musique.data,
+        type: musique.type,
       },
       success: (data) => {
         onSearch(searchRef.current.input.value);
@@ -104,15 +111,47 @@ const MusiquesCRUD = () => {
       },
     });
   };
+
+  const onClickPlay = (id) => {
+    if (id === playingId) {
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
+    } else {
+      get(API.getMusiqueById + "/" + id, {
+        success: (data) => {
+          setPlayingId(id);
+          setPlayingData(data.data);
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    audioRef.current.play();
+  }, [playingData]);
+
   return (
     <Layout
       style={{
         height: "100vh",
       }}
     >
+      <audio
+        ref={audioRef}
+        src={playingData}
+        onTimeUpdate={() => {
+          console.log(audioRef.current.currentTime);
+        }}
+      ></audio>
       <Content
         style={{
-          padding: 30,
+          padding: "30px 30px 0 30px",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <Search ref={searchRef} onSearch={onSearch}></Search>
@@ -121,6 +160,8 @@ const MusiquesCRUD = () => {
           style={{
             width: "100%",
             marginTop: 30,
+            flex: 1,
+            overflowY: "scroll",
           }}
         >
           {musiques.map((musique, index, array) => {
@@ -216,15 +257,14 @@ const MusiquesCRUD = () => {
                         console.log(file);
                         //verify that type is audio
                         if (
-                          file.type !== "audio/mpeg" &&
                           file.type !== "audio/mp3" &&
                           file.type !== "audio/wav" &&
-                          file.type !== "audio/ogg"
+                          file.type !== "audio/mpeg"
                         ) {
                           notification.error({
                             message: "Erreur",
                             description:
-                              "Le fichier doit être au format .mpeg, .mp3, .wav ou .ogg",
+                              "Le fichier doit être au format .mp3 ou .wav",
                           });
                           return false;
                         }
@@ -239,6 +279,7 @@ const MusiquesCRUD = () => {
                         reader.readAsDataURL(file);
                         reader.onload = () => {
                           musique.data = reader.result;
+                          musique.type = file.type;
                           updateMusique(musique);
                         };
                         return false;
@@ -249,7 +290,18 @@ const MusiquesCRUD = () => {
                         icon={<UploadOutlined />}
                       ></Button>
                     </Upload>
-                    <audio controls={true} src={musique.data}></audio>
+                    <Button
+                      icon={
+                        playingId === musique._id ? (
+                          <PauseOutlined />
+                        ) : (
+                          <CaretRightOutlined />
+                        )
+                      }
+                      onClick={() => {
+                        onClickPlay(musique._id);
+                      }}
+                    ></Button>
                   </Space>
                 </Content>
               </Card>

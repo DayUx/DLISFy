@@ -12,4 +12,6 @@ export const API = {
   searchStyles: API_URL + "music/style/search",
   createStyle: API_URL + "admin/style",
   updateStyle: API_URL + "admin/style",
+  getMusiqueById: API_URL + "music/song/id",
+  getArtisteById: API_URL + "music/artist/id",
 };

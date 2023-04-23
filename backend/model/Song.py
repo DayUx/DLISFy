@@ -36,11 +36,12 @@ class UpdateSongModel(BaseModel):
     title:Optional[str]
     artists:Optional[list]
     album:Optional[str]
-    data: str = Field(...)
+    data: Optional[str]
     numberPlay:Optional[int]
     duration:Optional[int]
     styles:Optional[list]
-    image: str = Field(...)
+    image: Optional[str]
+    type: Optional[str]
 
 
     class Config:

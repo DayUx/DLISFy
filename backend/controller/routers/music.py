@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import base64
 import os
 from datetime import datetime, timedelta
 
+from bson import ObjectId
 from fastapi import APIRouter,status,HTTPException
+from mutagen.mp3 import MP3
+from mutagen.wave import WAVE
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 
@@ -31,17 +35,17 @@ async def getStyles(page_number:int):
         return style
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not found")
-@router.get("/style/{style_id}", response_model=StyleModel)
+@router.get("/style/id/{style_id}", response_model=StyleModel)
 async def getStyleById(style_id:str):
     try:
         style = await db.style.find_one({"_id": style_id})
         return style
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not found")
-@router.get("/artist/{artist_id}", response_model=ArtistModel)
+@router.get("/artist/id/{artist_id}", response_model=ArtistModel)
 async def getArtistById(artist_id:str):
     try:
-        artist = await db.artist.find_one({"_id": artist_id})
+        artist = await db.artist.find_one({"_id": ObjectId(artist_id)})
         return artist
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Artist not found")
@@ -77,12 +81,25 @@ async def getSongs(page_number:int):
         return song
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not found")
-@router.get("/song/{song_id}", response_model=SongModel)
+@router.get("/song/id/{song_id}", response_model=SongModel)
 async def getSongById(song_id:str):
     try:
-        song = await db.song.find_one({"_id": song_id})
+        song = await db.song.find_one({"_id": ObjectId(song_id)})
+        if song.get("duration") is None:
+            decoded_data = base64.b64decode(song.get("data"), ' /')
+            # save audio file
+            file = open("temp", "wb")
+            file.write(decoded_data)
+            audio = None
+            if song.get("type") == "audio/wav":
+                audio = WAVE("temp")
+            if song.get("type") == "audio/mp3" or song.get("type") == "audio/mpeg":
+                audio = MP3("temp")
+            await db.song.update_one({"_id": ObjectId(song_id)}, {"$set": {"duration": audio.info.length}})
+            song = await db.song.find_one({"_id": ObjectId(song_id)})
         return song
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not found")
 @router.get("/song/artist/{artist_id}", response_model=list[SongModel])
 async def getSongsByArtist(artist_id:str):
@@ -114,7 +131,7 @@ async def getAlbums(page_number:int):
         return album
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Album not found")
-@router.get("/album/{album_id}", response_model=AlbumModel)
+@router.get("/album/id/{album_id}", response_model=AlbumModel)
 async def getAlbumById(album_id:str):
     try:
         album = await db.album.find_one({"_id": album_id})

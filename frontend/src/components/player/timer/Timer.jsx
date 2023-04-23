@@ -7,14 +7,10 @@ const { Sider, Content } = Layout;
 const Timer = forwardRef(
   ({ currentTime, endTime, onAfterChange = function () {} }, ref) => {
     const [current, setCurrent] = useState(currentTime);
-    useImperativeHandle(ref, () => ({
-      setCurrentTime: (time) => {
-        setCurrent(time);
-      },
-    }));
+    const [isDragging, setIsDragging] = useState(false);
 
     const sliderChange = (value) => {
-      setCurrent(endTime * (value / 100));
+      onAfterChange(endTime * (value / 100));
     };
 
     const formatTime = (time) => {
@@ -44,14 +40,14 @@ const Timer = forwardRef(
         }}
       >
         <Col span={4} className={"current-time"}>
-          <Text>{formatTime(current)}</Text>
+          <Text>{formatTime(currentTime)}</Text>
         </Col>
         <Col span={16}>
           <Slider
             onAfterChange={onAfterChange}
             tooltip={{ formatter: null }}
             onChange={sliderChange}
-            defaultValue={(currentTime / endTime) * 100}
+            value={(currentTime / endTime) * 100}
           ></Slider>
         </Col>
         <Col span={4} className={"end-time"}>
