@@ -65,6 +65,7 @@ class SongModelLite(BaseModel):
     artists: list = Field(default_factory=list)
     album: Optional[str] = None
     duration: Optional[int] = None
+    data: str = Field(...)
     numberPlay: Optional[int] = None
     styles: list = Field(default_factory=list)
     image: str = Field(...)

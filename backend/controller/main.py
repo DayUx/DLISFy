@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import dependencies
 from .internal import admin
-from .routers import auth, music
+from .routers import auth, music, stream
 from dotenv import load_dotenv,find_dotenv
 load_dotenv(find_dotenv())
 app = FastAPI()
@@ -32,6 +32,13 @@ app.include_router(
     prefix="/music",
     tags=["app"],
     dependencies=[Depends(dependencies.isTokenValid)],
+    responses={418: {"description": "I'm a teapot"}},
+)
+app.include_router(
+    stream.router,
+    prefix="/stream",
+    tags=["app"],
+    # dependencies=[Depends(dependencies.isTokenValid)],
     responses={418: {"description": "I'm a teapot"}},
 )
 

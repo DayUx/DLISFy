@@ -82,7 +82,7 @@ const Rechercher = forwardRef(({ playMusic = function () {} }, ref) => {
           {musiques.map((musique, index, array) => {
             return (
               <Card
-                key={musique.id}
+                key={index}
                 style={{
                   width: "100%",
                   padding: 0,
@@ -102,27 +102,32 @@ const Rechercher = forwardRef(({ playMusic = function () {} }, ref) => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Space
+                  <Content
                     style={{
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <Image
-                      preview={false}
-                      style={{
-                        width: 50,
-                        objectFit: "cover",
-                        height: 50,
-                        borderRadius: 5,
-                      }}
-                      src={musique.image}
-                    />
+                    <Space>
+                      <Image
+                        preview={false}
+                        style={{
+                          width: 50,
+                          objectFit: "cover",
+                          height: 50,
+                          borderRadius: 5,
+                        }}
+                        src={musique.image}
+                      />
 
-                    <Text strong>{musique.title}</Text>
+                      <Text strong>{musique.title}</Text>
+                    </Space>
 
                     <Button
+                      shape={"circle"}
+                      type={"primary"}
                       icon={
                         playingId === musique._id ? (
                           <PauseOutlined />
@@ -134,7 +139,7 @@ const Rechercher = forwardRef(({ playMusic = function () {} }, ref) => {
                         onClickPlay(musique._id);
                       }}
                     ></Button>
-                  </Space>
+                  </Content>
                 </Content>
               </Card>
             );

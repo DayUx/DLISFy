@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { Col, Layout, Row, Slider, Typography } from "antd";
+import { Col, Layout, Row, Skeleton, Slider, Typography } from "antd";
 
 const { Text, Link } = Typography;
 
@@ -14,6 +14,7 @@ const Timer = forwardRef(
     };
 
     const formatTime = (time) => {
+      if (!time) return "--:--";
       const heures = Math.floor(time / 3600);
       const minutes = Math.floor((time - heures * 3600) / 60);
       const secondes = Math.floor(time - heures * 3600 - minutes * 60);

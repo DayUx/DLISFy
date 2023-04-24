@@ -118,7 +118,7 @@ async def getSongsByStyle(style_id:str):
 @router.get("/song/search/{song_name}", response_model=list[SongModelLite])
 async def searchSongs(song_name:str):
     try:
-        song = [doc async for doc in db.song.find({"title": {"$regex": song_name}},{"data":0})]
+        song = [doc async for doc in db.song.find({"title": {"$regex": song_name}})]
         return song
     except Exception as e:
         print(e)

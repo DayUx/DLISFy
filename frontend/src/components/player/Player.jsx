@@ -32,11 +32,12 @@ const Player = forwardRef(({}, ref) => {
 
   useEffect(() => {
     subscribe("play", (e) => {
+      console.log("play", e.detail);
       const data = e.detail;
       setIsPlaying(true);
       if (playingId === data.id) {
         console.log("play from pause", data.id, playingId);
-        audioRef.current.play();
+        audioRef.current?.play();
       }
       setPlayingId(data.id);
       setPlayingAlbumId(data.albumId);
@@ -45,7 +46,7 @@ const Player = forwardRef(({}, ref) => {
     });
 
     subscribe("pause", (e) => {
-      audioRef.current.pause();
+      audioRef.current?.pause();
       setIsPlaying(false);
     });
   }, []);
@@ -65,8 +66,8 @@ const Player = forwardRef(({}, ref) => {
   }, [playingId]);
 
   useEffect(() => {
-    console.log("play data changed");
-    audioRef.current.play();
+    if (!playingData) return;
+    audioRef.current?.play();
   }, [playingData]);
   const audioRef = useRef(null);
 
@@ -100,8 +101,15 @@ const Player = forwardRef(({}, ref) => {
               justifyContent: "center",
             }}
           >
-            <Button shape={"circle"} icon={<StepBackwardOutlined />}></Button>
             <Button
+              type={"primary"}
+              ghost
+              shape={"circle"}
+              icon={<StepBackwardOutlined />}
+            ></Button>
+            <Button
+              type={"primary"}
+              ghost
               size={"large"}
               shape={"circle"}
               onClick={() => {
@@ -124,7 +132,12 @@ const Player = forwardRef(({}, ref) => {
               }}
               icon={isPlaying ? <PauseOutlined /> : <CaretRightOutlined />}
             ></Button>
-            <Button shape={"circle"} icon={<StepForwardOutlined />}></Button>
+            <Button
+              type={"primary"}
+              ghost
+              shape={"circle"}
+              icon={<StepForwardOutlined />}
+            ></Button>
           </Space>
           <Timer
             onAfterChange={(time) => {

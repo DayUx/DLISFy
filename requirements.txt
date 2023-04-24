@@ -11,3 +11,4 @@ bcrypt==4.0.1
 
 mutagen~=1.46.0
 audioread~=3.0.0
+starlette~=0.26.1

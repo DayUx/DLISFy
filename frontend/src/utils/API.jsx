@@ -14,4 +14,5 @@ export const API = {
   updateStyle: API_URL + "admin/style",
   getMusiqueById: API_URL + "music/song/id",
   getArtisteById: API_URL + "music/artist/id",
+  streamMusique: API_URL + "stream/song",
 };

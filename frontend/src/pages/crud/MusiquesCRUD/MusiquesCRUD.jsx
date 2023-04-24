@@ -35,6 +35,7 @@ const MusiquesCRUD = () => {
   const [musiques, setMusiques] = useState([]);
   const [artistes, setArtistes] = useState([]);
   const [styles, setStyles] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [playingId, setPlayingId] = useState(null);
   const [playingData, setPlayingData] = useState(null);
   const searchRef = useRef(null);
@@ -64,6 +65,7 @@ const MusiquesCRUD = () => {
     const reader = new FileReader();
     reader.readAsDataURL(music[0]);
     reader.onload = () => {
+      debugger;
       post(API.createMusique, {
         body: {
           image: imageUrl,
@@ -107,25 +109,24 @@ const MusiquesCRUD = () => {
     }
     get(API.searchMusiques + "/" + value, {
       success: (data) => {
+        console.log(data);
         setMusiques(data);
       },
     });
   };
 
-  const onClickPlay = (id) => {
-    if (id === playingId) {
+  const onClickPlay = (id, data) => {
+    if (playingId === id) {
       if (audioRef.current.paused) {
         audioRef.current.play();
+        setIsPlaying(true);
       } else {
         audioRef.current.pause();
+        setIsPlaying(false);
       }
     } else {
-      get(API.getMusiqueById + "/" + id, {
-        success: (data) => {
-          setPlayingId(id);
-          setPlayingData(data.data);
-        },
-      });
+      setPlayingId(id);
+      setPlayingData(API.streamMusique + "/" + data);
     }
   };
 
@@ -139,13 +140,7 @@ const MusiquesCRUD = () => {
         height: "100vh",
       }}
     >
-      <audio
-        ref={audioRef}
-        src={playingData}
-        onTimeUpdate={() => {
-          console.log(audioRef.current.currentTime);
-        }}
-      ></audio>
+      <audio ref={audioRef} src={playingData}></audio>
       <Content
         style={{
           padding: "30px 30px 0 30px",
@@ -292,14 +287,14 @@ const MusiquesCRUD = () => {
                     </Upload>
                     <Button
                       icon={
-                        playingId === musique._id ? (
+                        playingId === musique._id && isPlaying ? (
                           <PauseOutlined />
                         ) : (
                           <CaretRightOutlined />
                         )
                       }
                       onClick={() => {
-                        onClickPlay(musique._id);
+                        onClickPlay(musique._id, musique.data);
                       }}
                     ></Button>
                   </Space>
@@ -323,56 +318,39 @@ const MusiquesCRUD = () => {
             justifyContent: "center",
           }}
         >
-          <Upload
-            maxCount={1}
-            iconRender={() => {
-              return <PlusOutlined />;
-            }}
-            itemRender={(originNode, file, currFileList) => {
-              const Player = ({ file }) => {
-                const [audio, setAudio] = useState(null);
+          <Form.Item>
+            <Upload
+              maxCount={1}
+              iconRender={() => {
+                return <PlusOutlined />;
+              }}
+              itemRender={(originNode, file, currFileList) => {
+                const Player = ({ file }) => {
+                  const [audio, setAudio] = useState(null);
+                  useEffect(() => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                      setAudio(reader.result);
+                    };
+                  }, [file]);
+                  return <audio src={audio} controls></audio>;
+                };
+                return <Player file={file}></Player>;
+              }}
+              fileList={music}
+              accept={".mp3,.wav"}
+              beforeUpload={(file) => {
+                setMusic([file]);
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>
+                Uploader le fichier audio
+              </Button>
+            </Upload>
+          </Form.Item>
 
-                useEffect(() => {
-                  const reader = new FileReader();
-                  reader.readAsDataURL(file);
-                  reader.onload = () => {
-                    setAudio(reader.result);
-                  };
-                }, [file]);
-                return <audio src={audio} controls></audio>;
-              };
-              return <Player file={file}></Player>;
-            }}
-            fileList={music}
-            beforeUpload={(file) => {
-              console.log(file);
-              //verify that type is audio
-              if (
-                file.type !== "audio/mpeg" &&
-                file.type !== "audio/mp3" &&
-                file.type !== "audio/wav" &&
-                file.type !== "audio/ogg"
-              ) {
-                notification.error({
-                  message: "Erreur",
-                  description:
-                    "Le fichier doit être au format .mpeg, .mp3, .wav ou .ogg",
-                });
-                return false;
-              }
-              if (file.size / 1024 / 1024 > 5) {
-                notification.error({
-                  message: "Erreur",
-                  description: "Le fichier ne doit pas dépasser 5Mo",
-                });
-                return false;
-              }
-              setMusic([file]);
-              return false;
-            }}
-          >
-            <Button icon={<UploadOutlined />}>Uploader le fichier audio</Button>
-          </Upload>
           <Upload
             listType="picture-card"
             className="avatar-uploader"

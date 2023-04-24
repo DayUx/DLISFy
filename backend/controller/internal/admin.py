@@ -1,22 +1,26 @@
 import base64
 import os
+from typing import Optional
 
+import gridfs
 import motor.motor_asyncio
 from bson import ObjectId
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, UploadFile, File
 from mutagen.wave import WAVE
 from mutagen.mp3 import MP3
 from mutagen.wave import WAVE
+from pydantic import BaseModel, Field
+from pymongo import MongoClient
 
 from backend.model.Album import AlbumModel
 from backend.model.Artist import ArtistModel
+from backend.model.PyObjectId import PyObjectId
 from backend.model.Song import SongModel, UpdateSongModel
 from backend.model.Style import StyleModel
 
 router = APIRouter()
-client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("MONGODB_URL"))
-db = client.dlisfy
-
+db = MongoClient().dlisfy
+fs = gridfs.GridFS(db)
 @router.get("/")
 async def hasAccess():
     return HTTPException(status_code=status.HTTP_200_OK, detail="Access granted")
@@ -43,8 +47,23 @@ async def updateArtist(artist_id:str, artist: ArtistModel):
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Artist not updated")
 
+
+
+class SongDTO(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    title: str = Field(...)
+    artists: list = Field(default_factory=list)
+    album: Optional[str] = None
+    file: UploadFile = File(...)
+    duration: Optional[int] = None
+    numberPlay: Optional[int] = None
+    styles: list = Field(default_factory=list)
+    image: str = Field(...)
+    type: str = Field(...)
+
 @router.post("/song", )
 async def addSong(song: SongModel):
+    print(song.data)
     if len(song.data.strip()) == 0:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Veuillez ajouter un fichier audio")
     if len(song.title.strip()) == 0:
@@ -52,16 +71,8 @@ async def addSong(song: SongModel):
     if len(song.image.strip()) == 0:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Veuillez ajouter une image")
     try:
-        # get base64 audio file duration
-        # decode base64 audio file
-
-        # remove start of base64 to base64,
-        # indexComma = song.data.find(",")
-        # song.data = song.data[indexComma + 1:]
+        print(song.data)
         decoded_data = base64.b64decode(song.data, ' /')
-        # get audio file duration
-
-
         # save audio file
         file = open("temp", "wb")
         file.write(decoded_data)
@@ -70,9 +81,9 @@ async def addSong(song: SongModel):
             audio = WAVE("temp")
         if song.type == "audio/mp3" or song.type == "audio/mpeg":
             audio = MP3("temp")
-
+        id = fs.put(decoded_data, filename=song.title, content_type=song.type)
         song.duration = audio.info.length
-
+        song.data = str(id)
         await db.song.insert_one(song.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song added")
     except Exception as e:
@@ -83,9 +94,10 @@ async def addSong(song: SongModel):
 @router.put("/song/{song_id}", )
 async def updateSong(song_id:str, song: UpdateSongModel):
     try:
-        await db.song.update_one({"_id": ObjectId(song_id)}, {"$set": song.dict()})
+        db.song.update_one({"_id": ObjectId(song_id)}, {"$set": song.dict()})
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song updated")
-    except:
+    except Exception as e:
+        print(e)
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not updated")
 @router.delete("/song/{song_id}", )
 async def deleteSong(song_id:str):
