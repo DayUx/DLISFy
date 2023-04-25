@@ -45,7 +45,6 @@ const Timer = forwardRef(
         </Col>
         <Col span={16}>
           <Slider
-            onAfterChange={onAfterChange}
             tooltip={{ formatter: null }}
             onChange={sliderChange}
             value={(currentTime / endTime) * 100}

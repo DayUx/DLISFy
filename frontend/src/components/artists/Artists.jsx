@@ -62,7 +62,7 @@ const Artists = ({ artists }) => {
       direction={"vertical"}
     >
       <Typography.Title level={3}>Artistes</Typography.Title>
-      <Row>
+      <Row gutter={10}>
         {artists.map((artist, index, grid) => {
           const width = screenSize.width;
           let max = Math.floor(width / 200);
@@ -79,13 +79,7 @@ const Artists = ({ artists }) => {
             return null;
           }
           return (
-            <Col
-              style={{
-                padding: 5,
-              }}
-              key={index}
-              span={24 / max}
-            >
+            <Col key={index} span={24 / max}>
               <Card
                 style={{
                   overflow: "hidden",

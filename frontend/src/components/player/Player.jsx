@@ -24,6 +24,7 @@ const Player = forwardRef(({}, ref) => {
     albumId: null,
     playlistId: null,
     artistId: null,
+    styleId: null,
     likes: null,
     titles: [],
   });
@@ -83,11 +84,62 @@ const Player = forwardRef(({}, ref) => {
   const onTimeUpdate = () => {
     setCurrentTime(audioRef.current.currentTime);
   };
+  const previous = () => {
+    if (previousDisabled()) return;
+    const index = songPlaying.titles.findIndex(
+      (t) => t.titleId === songPlaying.id
+    );
+    console.log("prev", index);
+    publish("play", {
+      ...songPlaying,
+      id: songPlaying.titles[index - 1].titleId,
+    });
+  };
+  const next = () => {
+    if (nextDisabled()) return;
+    const index = songPlaying.titles.findIndex(
+      (t) => t.titleId === songPlaying.id
+    );
+    console.log("next", index);
+    publish("play", {
+      ...songPlaying,
+      id: songPlaying.titles[index + 1].titleId,
+    });
+  };
+
+  const nextDisabled = () => {
+    return (
+      songPlaying.titles.findIndex((t) => t.titleId === songPlaying.id) ===
+        songPlaying.titles.length - 1 || songPlaying.titles.length === 0
+    );
+  };
+  const previousDisabled = () => {
+    return (
+      songPlaying.titles.findIndex((t) => t.titleId === songPlaying.id) === 0 ||
+      songPlaying.titles.length === 0
+    );
+  };
 
   return (
     <Layout>
       <audio
         ref={audioRef}
+        onEnded={() => {
+          const index = songPlaying.titles.findIndex(
+            (t) => t.titleId === songPlaying.id
+          );
+
+          console.log("next", index);
+          if (index + 1 === songPlaying.titles.length) {
+            publish("pause", { id: songPlaying.artistId });
+            return;
+          }
+          publish("play", {
+            id: songPlaying.titles[index + 1]?.titleId,
+            artistId: songPlaying.artistId,
+            titles: songPlaying.titles,
+          });
+        }}
         src={
           API.streamMusique +
           "/" +
@@ -118,21 +170,8 @@ const Player = forwardRef(({}, ref) => {
               type={"primary"}
               ghost
               shape={"circle"}
-              disabled={
-                songPlaying.titles.findIndex(
-                  (t) => t.titleId === songPlaying.id
-                ) === 0 || songPlaying.titles.length === 0
-              }
-              onClick={() => {
-                const index = songPlaying.titles.findIndex(
-                  (t) => t.titleId === songPlaying.id
-                );
-                console.log("prev", index);
-                publish("play", {
-                  ...songPlaying,
-                  id: songPlaying.titles[index - 1].titleId,
-                });
-              }}
+              disabled={previousDisabled()}
+              onClick={previous}
               icon={<StepBackwardOutlined />}
             ></Button>
             <Button
@@ -153,29 +192,15 @@ const Player = forwardRef(({}, ref) => {
             <Button
               type={"primary"}
               ghost
-              disabled={
-                songPlaying.titles.findIndex(
-                  (t) => t.titleId === songPlaying.id
-                ) ===
-                  songPlaying.titles.length - 1 ||
-                songPlaying.titles.length === 0
-              }
-              onClick={() => {
-                const index = songPlaying.titles.findIndex(
-                  (t) => t.titleId === songPlaying.id
-                );
-                console.log("next", index);
-                publish("play", {
-                  ...songPlaying,
-                  id: songPlaying.titles[index + 1].titleId,
-                });
-              }}
+              disabled={nextDisabled()}
+              onClick={next}
               shape={"circle"}
               icon={<StepForwardOutlined />}
             ></Button>
           </Space>
           <Timer
             onAfterChange={(time) => {
+              console.log("onAfterChange", time);
               audioRef.current.currentTime = time;
             }}
             currentTime={currentTime}

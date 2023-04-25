@@ -23,7 +23,7 @@ import {
 } from "antd";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { API } from "../../utils/API.jsx";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo.svg";
 import Bibliotheque from "../bibliotheque/Bibliotheque.jsx";
 import Likes from "../likes/Likes.jsx";
 import Rechercher from "../rechercher/Rechercher.jsx";

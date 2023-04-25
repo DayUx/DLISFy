@@ -112,9 +112,10 @@ async def getSongsByArtist(artist_id:str):
 @router.get("/song/style/{style_id}", response_model=list[SongModel])
 async def getSongsByStyle(style_id:str):
     try:
-        song = await db.song.find({"styles": {"$in": style_id}})
+        song = [doc async for doc in db.song.find({"styles": style_id})]
         return song
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not found")
 @router.get("/song/search/{song_name}", response_model=list[SongModelLite])
 async def searchSongs(song_name:str):

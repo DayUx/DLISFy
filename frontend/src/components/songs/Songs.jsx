@@ -26,6 +26,16 @@ const Songs = ({ songs }) => {
   }, [screenSize]);
   useEffect(() => {
     subscribe("play", (e) => {
+      if (
+        e.detail.playlistId ||
+        e.detail.albumId ||
+        e.detail.artistId ||
+        e.detail.styleId ||
+        e.detail.likes
+      ) {
+        setPlayingId(null);
+        return;
+      }
       setPlayingId(e.detail.id);
     });
     subscribe("pause", (e) => {
@@ -65,8 +75,10 @@ const Songs = ({ songs }) => {
       <Typography.Title level={3}>Titres</Typography.Title>
 
       <Row
+        gutter={10}
         style={{
           width: "100%",
+
           flex: 1,
           overflowY: "auto",
         }}
@@ -89,7 +101,7 @@ const Songs = ({ songs }) => {
           return (
             <Col
               style={{
-                padding: 5,
+                marginBottom: 10,
               }}
               span={24 / max}
             >

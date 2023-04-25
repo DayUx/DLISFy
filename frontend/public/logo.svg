@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 63">
+    <title>Fichier 1</title>
+    <g id="Calque_2" data-name="Calque 2">
+        <g id="Calque_1-2" fill="#1668DC" data-name="Calque 1">
+            <polygon points="0 18 72 18 72 36 0 36 0 63 18 63 18 54 90 54 90 0 0 0 0 18"/>
+            <polygon points="171 36 117 36 117 0 99 0 99 54 189 54 189 0 171 0 171 36"/>
+            <polygon points="198 54 216 54 216 18 270 18 270 54 288 54 288 0 198 0 198 54"/>
+            <polygon points="297 18 333 18 333 54 351 54 351 18 387 18 387 0 297 0 297 18"/>
+            <rect x="396" width="18" height="54"/>
+            <polygon points="423 54 441 54 441 45 477 45 477 27 441 27 441 18 513 18 513 0 423 0 423 54"/>
+            <polygon points="594 0 594 27 540 27 540 0 522 0 522 45 594 45 594 54 612 54 612 45 612 36 612 0 594 0"/>
+        </g>
+    </g>
+</svg>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
-import logo from "./assets/logo.png";
+import logo from "./assets/logo.svg";
 import {
   AimOutlined,
   MenuFoldOutlined,
@@ -125,6 +125,7 @@ function App() {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
+                    padding: "40px 0",
                   }}
                 >
                   <img width={"80%"} alt={"logo"} src={logo} />
