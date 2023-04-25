@@ -123,6 +123,16 @@ const Player = forwardRef(({}, ref) => {
                   (t) => t.titleId === songPlaying.id
                 ) === 0 || songPlaying.titles.length === 0
               }
+              onClick={() => {
+                const index = songPlaying.titles.findIndex(
+                  (t) => t.titleId === songPlaying.id
+                );
+                console.log("prev", index);
+                publish("play", {
+                  ...songPlaying,
+                  id: songPlaying.titles[index - 1].titleId,
+                });
+              }}
               icon={<StepBackwardOutlined />}
             ></Button>
             <Button
@@ -150,6 +160,16 @@ const Player = forwardRef(({}, ref) => {
                   songPlaying.titles.length - 1 ||
                 songPlaying.titles.length === 0
               }
+              onClick={() => {
+                const index = songPlaying.titles.findIndex(
+                  (t) => t.titleId === songPlaying.id
+                );
+                console.log("next", index);
+                publish("play", {
+                  ...songPlaying,
+                  id: songPlaying.titles[index + 1].titleId,
+                });
+              }}
               shape={"circle"}
               icon={<StepForwardOutlined />}
             ></Button>
