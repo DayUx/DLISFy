@@ -55,14 +55,12 @@ function App() {
   }, [playerRef]);
 
   useEffect(() => {
-    if (!localStorage.getItem("access_token")) {
-      notification.error({
-        message: "Erreur",
-        description: "Veuillez vous connecter",
-      });
-      utils.navigate("/login");
+    for (const item of items) {
+      if (utils.location.pathname === item.url) {
+        setSelectedKey(item.key);
+      }
     }
-  });
+  }, []);
   const checkToken = (element) => {
     if (!localStorage.getItem("token")) {
       return <Login />;
@@ -79,19 +77,19 @@ function App() {
     },
     {
       key: "1",
-      url: "rechercher",
+      url: "/rechercher",
       icon: <SearchOutlined />,
       label: "Rechercher",
     },
     {
       key: "2",
-      url: "bibliotheque",
+      url: "/bibliotheque",
       icon: selectedKey === "2" ? <BookFilled /> : <BookOutlined />,
       label: "Bibliothèque",
     },
     {
       key: "3",
-      url: "likes",
+      url: "/likes",
       icon: selectedKey === "3" ? <HeartFilled /> : <HeartOutlined />,
       label: "Titres likés",
     },

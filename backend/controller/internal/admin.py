@@ -84,7 +84,7 @@ async def addSong(song: SongModel):
         id = fs.put(decoded_data, filename=song.title, content_type=song.type)
         song.duration = audio.info.length
         song.data = str(id)
-        await db.song.insert_one(song.dict())
+        db.song.insert_one(song.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song added")
     except Exception as e:
         print(e)
@@ -94,7 +94,23 @@ async def addSong(song: SongModel):
 @router.put("/song/{song_id}", )
 async def updateSong(song_id:str, song: UpdateSongModel):
     try:
-        db.song.update_one({"_id": ObjectId(song_id)}, {"$set": song.dict()})
+
+        # remove attributes that are not in the model
+        if song.data is not None:
+            decoded_data = base64.b64decode(song.data, ' /')
+            # save audio file
+            file = open("temp", "wb")
+            file.write(decoded_data)
+            audio = None
+            if song.type == "audio/wav":
+                audio = WAVE("temp")
+            if song.type == "audio/mp3" or song.type == "audio/mpeg":
+                audio = MP3("temp")
+            id = fs.put(decoded_data, filename=song.title, content_type=song.type)
+            song.duration = audio.info.length
+            song.data = str(id)
+
+        db.song.update_one({"_id": ObjectId(song_id)}, {"$set": song.dict(exclude_unset = True)})
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song updated")
     except Exception as e:
         print(e)

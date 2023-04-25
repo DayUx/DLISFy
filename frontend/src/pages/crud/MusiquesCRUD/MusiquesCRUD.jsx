@@ -11,6 +11,7 @@ import {
   Image,
   Select,
   Tooltip,
+  Segmented,
 } from "antd";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -93,7 +94,7 @@ const MusiquesCRUD = () => {
         artists: musique.artists,
         styles: musique.styles,
         album: musique.album,
-        data: musique.data,
+        data: musique?.file,
         type: musique.type,
       },
       success: (data) => {
@@ -116,7 +117,14 @@ const MusiquesCRUD = () => {
   };
 
   const onClickPlay = (id, data) => {
-    if (playingId === id) {
+    if (!data) {
+      notification.error({
+        message: "Erreur",
+        description: "Aucune musique n'a été trouvée",
+      });
+      return;
+    }
+    if (playingId === id && playingData) {
       if (audioRef.current.paused) {
         audioRef.current.play();
         setIsPlaying(true);
@@ -126,12 +134,14 @@ const MusiquesCRUD = () => {
       }
     } else {
       setPlayingId(id);
+
       setPlayingData(API.streamMusique + "/" + data);
     }
   };
 
   useEffect(() => {
     audioRef.current.play();
+    setIsPlaying(true);
   }, [playingData]);
 
   return (
@@ -162,7 +172,7 @@ const MusiquesCRUD = () => {
           {musiques.map((musique, index, array) => {
             return (
               <Card
-                key={musique.id}
+                key={index}
                 style={{
                   width: "100%",
                   padding: 0,
@@ -191,6 +201,7 @@ const MusiquesCRUD = () => {
                   >
                     <Upload
                       className={"hover-opacity"}
+                      accept={"image/*"}
                       showUploadList={false}
                       beforeUpload={(file) => {
                         if (
@@ -273,7 +284,7 @@ const MusiquesCRUD = () => {
                         const reader = new FileReader();
                         reader.readAsDataURL(file);
                         reader.onload = () => {
-                          musique.data = reader.result;
+                          musique.file = reader.result;
                           musique.type = file.type;
                           updateMusique(musique);
                         };

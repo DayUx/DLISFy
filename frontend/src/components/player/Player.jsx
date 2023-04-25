@@ -19,6 +19,7 @@ const Player = forwardRef(({}, ref) => {
   const [playingId, setPlayingId] = useState(null);
   const [playingPlaylistId, setPlayingPlaylistId] = useState(null);
   const [playingLikes, setPlayingLikes] = useState(null);
+  const [playingArtistId, setPlayingArtistId] = useState(null);
   const [playingData, setPlayingData] = useState(null);
   const [playingAlbumId, setPlayingAlbumId] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -32,7 +33,7 @@ const Player = forwardRef(({}, ref) => {
 
   useEffect(() => {
     subscribe("play", (e) => {
-      console.log("play", e.detail);
+      console.log("play", e.detail, playingId);
       const data = e.detail;
       setIsPlaying(true);
       if (playingId === data.id) {
@@ -42,6 +43,7 @@ const Player = forwardRef(({}, ref) => {
       setPlayingId(data.id);
       setPlayingAlbumId(data.albumId);
       setPlayingPlaylistId(data.playlistId);
+      setPlayingArtistId(data.artistId);
       setPlayingLikes(data.likes);
     });
 
@@ -54,7 +56,7 @@ const Player = forwardRef(({}, ref) => {
   useEffect(() => {
     get(API.getMusiqueById + "/" + playingId, {
       success: (data) => {
-        setPlayingData(data.data);
+        setPlayingData(API.streamMusique + "/" + data.data);
         setSong({
           title: data.title,
           artists: data.artists,
@@ -93,7 +95,7 @@ const Player = forwardRef(({}, ref) => {
             }}
           ></SongPreview>
         </Col>
-        <Col span={12}>
+        <Col span={8}>
           <Space
             size={20}
             style={{
@@ -119,6 +121,7 @@ const Player = forwardRef(({}, ref) => {
                     id: playingId,
                     albumId: playingAlbumId,
                     playlistId: playingPlaylistId,
+                    artistId: playingArtistId,
                     likes: playingLikes,
                   });
                 } else {
@@ -126,6 +129,7 @@ const Player = forwardRef(({}, ref) => {
                     id: playingId,
                     albumId: playingAlbumId,
                     playlistId: playingPlaylistId,
+                    artistId: playingArtistId,
                     likes: playingLikes,
                   });
                 }
@@ -147,7 +151,7 @@ const Player = forwardRef(({}, ref) => {
             endTime={song.duration}
           ></Timer>
         </Col>
-        <Col span={4}>
+        <Col offset={2} span={4}>
           <Volume
             onChange={(value) => {
               audioRef.current.volume = value / 100;
