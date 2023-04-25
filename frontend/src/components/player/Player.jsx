@@ -9,21 +9,28 @@ import {
   StepForwardOutlined,
 } from "@ant-design/icons";
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { publish, subscribe } from "../../utils/events.jsx";
+import { publish, subscribe, unsubscribe } from "../../utils/events.jsx";
 import { get } from "../../utils/CustomRequests.jsx";
 import { API } from "../../utils/API.jsx";
 import Volume from "./Volume.jsx";
 
 const Player = forwardRef(({}, ref) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playingId, setPlayingId] = useState(null);
-  const [playingPlaylistId, setPlayingPlaylistId] = useState(null);
-  const [playingLikes, setPlayingLikes] = useState(null);
-  const [playingArtistId, setPlayingArtistId] = useState(null);
-  const [playingData, setPlayingData] = useState(null);
-  const [playingAlbumId, setPlayingAlbumId] = useState(null);
+
   const [currentTime, setCurrentTime] = useState(0);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(localStorage.getItem("volume") || 50);
+  const [songPlaying, setSongPlaying] = useState({
+    id: null,
+    albumId: null,
+    playlistId: null,
+    artistId: null,
+    likes: null,
+    titles: [],
+  });
+
+  useEffect(() => {
+    localStorage.setItem("volume", volume);
+  }, [volume]);
 
   const [song, setSong] = useState({
     title: null,
@@ -32,45 +39,45 @@ const Player = forwardRef(({}, ref) => {
   });
 
   useEffect(() => {
-    subscribe("play", (e) => {
-      console.log("play", e.detail, playingId);
-      const data = e.detail;
-      setIsPlaying(true);
-      if (playingId === data.id) {
-        console.log("play from pause", data.id, playingId);
-        audioRef.current?.play();
-      }
-      setPlayingId(data.id);
-      setPlayingAlbumId(data.albumId);
-      setPlayingPlaylistId(data.playlistId);
-      setPlayingArtistId(data.artistId);
-      setPlayingLikes(data.likes);
+    get(API.getMusiqueById + "/" + songPlaying.id, {
+      success: (data) => {
+        console.log("get musique", data);
+        setSong({
+          ...data,
+        });
+      },
     });
+    audioRef.current?.play();
+  }, [songPlaying.id]);
 
+  const play = (e) => {
+    console.log("play", e.detail, songPlaying);
+    const data = e.detail;
+    setIsPlaying(true);
+    if (songPlaying.id === data.id) {
+      console.log("play from pause", data.id, songPlaying.id);
+      audioRef.current?.play();
+    }
+    setSongPlaying({
+      ...data,
+    });
+  };
+
+  useEffect(() => {
+    subscribe("play", play);
+    return () => {
+      unsubscribe("play", play);
+    };
+  }, [songPlaying]);
+
+  useEffect(() => {
     subscribe("pause", (e) => {
       audioRef.current?.pause();
       setIsPlaying(false);
     });
+    audioRef.current.volume = volume / 100;
   }, []);
 
-  useEffect(() => {
-    get(API.getMusiqueById + "/" + playingId, {
-      success: (data) => {
-        setPlayingData(API.streamMusique + "/" + data.data);
-        setSong({
-          title: data.title,
-          artists: data.artists,
-          image: data.image,
-          duration: data.duration,
-        });
-      },
-    });
-  }, [playingId]);
-
-  useEffect(() => {
-    if (!playingData) return;
-    audioRef.current?.play();
-  }, [playingData]);
   const audioRef = useRef(null);
 
   const onTimeUpdate = () => {
@@ -81,7 +88,11 @@ const Player = forwardRef(({}, ref) => {
     <Layout>
       <audio
         ref={audioRef}
-        src={playingData}
+        src={
+          API.streamMusique +
+          "/" +
+          songPlaying.titles.find((t) => t.titleId === songPlaying.id)?.fileId
+        }
         onTimeUpdate={onTimeUpdate}
       ></audio>
       <Row align={"middle"}>
@@ -107,6 +118,11 @@ const Player = forwardRef(({}, ref) => {
               type={"primary"}
               ghost
               shape={"circle"}
+              disabled={
+                songPlaying.titles.findIndex(
+                  (t) => t.titleId === songPlaying.id
+                ) === 0 || songPlaying.titles.length === 0
+              }
               icon={<StepBackwardOutlined />}
             ></Button>
             <Button
@@ -117,21 +133,9 @@ const Player = forwardRef(({}, ref) => {
               onClick={() => {
                 console.log("play", isPlaying);
                 if (isPlaying) {
-                  publish("pause", {
-                    id: playingId,
-                    albumId: playingAlbumId,
-                    playlistId: playingPlaylistId,
-                    artistId: playingArtistId,
-                    likes: playingLikes,
-                  });
+                  publish("pause");
                 } else {
-                  publish("play", {
-                    id: playingId,
-                    albumId: playingAlbumId,
-                    playlistId: playingPlaylistId,
-                    artistId: playingArtistId,
-                    likes: playingLikes,
-                  });
+                  publish("play", songPlaying);
                 }
               }}
               icon={isPlaying ? <PauseOutlined /> : <CaretRightOutlined />}
@@ -139,6 +143,13 @@ const Player = forwardRef(({}, ref) => {
             <Button
               type={"primary"}
               ghost
+              disabled={
+                songPlaying.titles.findIndex(
+                  (t) => t.titleId === songPlaying.id
+                ) ===
+                  songPlaying.titles.length - 1 ||
+                songPlaying.titles.length === 0
+              }
               shape={"circle"}
               icon={<StepForwardOutlined />}
             ></Button>

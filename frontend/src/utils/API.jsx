@@ -15,4 +15,5 @@ export const API = {
   getMusiqueById: API_URL + "music/song/id",
   getArtisteById: API_URL + "music/artist/id",
   streamMusique: API_URL + "stream/song",
+  getMusiquesByArtisteId: API_URL + "music/song/artist",
 };

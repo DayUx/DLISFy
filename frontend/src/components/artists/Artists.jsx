@@ -2,6 +2,8 @@ import { Button, Card, Col, Row, Space, Typography } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { CaretRightOutlined, PauseOutlined } from "@ant-design/icons";
 import { publish, subscribe } from "../../utils/events.jsx";
+import { API } from "../../utils/API.jsx";
+import { get } from "../../utils/CustomRequests.jsx";
 
 const Artists = ({ artists }) => {
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
@@ -10,7 +12,7 @@ const Artists = ({ artists }) => {
 
   useEffect(() => {
     subscribe("play", (e) => {
-      setPlayingId(e.detail.id);
+      setPlayingId(e.detail.artistId);
     });
     subscribe("pause", (e) => {
       setPlayingId(null);
@@ -20,7 +22,18 @@ const Artists = ({ artists }) => {
     if (playingId === id) {
       publish("pause", { id: id });
     } else {
-      publish("play", { id: id });
+      get(API.getMusiquesByArtisteId + "/" + id, {
+        success: (data) => {
+          console.log(data[0]._id);
+          const titles = data.map((song) => {
+            return {
+              titleId: song._id,
+              fileId: song.data,
+            };
+          });
+          publish("play", { id: data[0]._id, artistId: id, titles: titles });
+        },
+      });
     }
   };
 

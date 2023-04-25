@@ -32,11 +32,27 @@ const Songs = ({ songs }) => {
       setPlayingId(null);
     });
   }, []);
-  const onClickPlay = (id) => {
+  const onClickPlay = (id, data) => {
     if (playingId === id) {
-      publish("pause", { id: id });
+      publish("pause", {
+        id: id,
+        titles: [
+          {
+            titleId: id,
+            fileId: data,
+          },
+        ],
+      });
     } else {
-      publish("play", { id: id });
+      publish("play", {
+        id: id,
+        titles: [
+          {
+            titleId: id,
+            fileId: data,
+          },
+        ],
+      });
     }
   };
   return (
@@ -152,7 +168,7 @@ const Songs = ({ songs }) => {
                         )
                       }
                       onClick={() => {
-                        onClickPlay(musique._id);
+                        onClickPlay(musique._id, musique.data);
                       }}
                     ></Button>
                   </Layout.Content>
