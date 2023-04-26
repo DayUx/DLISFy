@@ -39,6 +39,9 @@ import Likes from "./pages/likes/Likes.jsx";
 import Rechercher from "./pages/rechercher/Rechercher.jsx";
 import Accueil from "./pages/accueil/Accueil.jsx";
 import { utils } from "./utils/_helper.jsx";
+import { get } from "./utils/CustomRequests.jsx";
+import { API } from "./utils/API.jsx";
+import { publish } from "./utils/events.jsx";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -61,6 +64,7 @@ function App() {
       }
     }
   }, []);
+
   const checkToken = (element) => {
     if (!localStorage.getItem("token")) {
       return <Login />;

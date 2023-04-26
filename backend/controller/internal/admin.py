@@ -27,7 +27,7 @@ async def hasAccess():
 @router.post("/style", )
 async def addStyle(style: StyleModel):
     try:
-        await db.style.insert_one(style.dict())
+        db.style.insert_one(style.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Style added")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not added")
@@ -35,14 +35,14 @@ async def addStyle(style: StyleModel):
 @router.post("/artist", )
 async def addArtist(artist: ArtistModel):
     try:
-        await db.artist.insert_one(artist.dict())
+        db.artist.insert_one(artist.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Artist added")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Artist not added")
 @router.put("/artist/{artist_id}", )
 async def updateArtist(artist_id:str, artist: ArtistModel):
     try:
-        await db.artist.update_one({"_id": ObjectId(artist_id)}, {"$set": artist.dict()})
+        db.artist.update_one({"_id": ObjectId(artist_id)}, {"$set": artist.dict()})
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Artist updated")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Artist not updated")
@@ -118,7 +118,7 @@ async def updateSong(song_id:str, song: UpdateSongModel):
 @router.delete("/song/{song_id}", )
 async def deleteSong(song_id:str):
     try:
-        await db.song.delete_one({"_id": ObjectId(song_id)})
+        db.song.delete_one({"_id": ObjectId(song_id)})
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Song deleted")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not deleted")
@@ -141,14 +141,14 @@ async def updateAlbum(album_id:str, album: AlbumModel):
 @router.post("/style", )
 async def addStyle(style: StyleModel):
     try:
-        await db.style.insert_one(style.dict())
+        db.style.insert_one(style.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Style added")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not added")
 @router.put("/style/{style_id}", )
 async def updateStyle(style_id:str, style: StyleModel):
     try:
-        await db.style.update_one({"_id": ObjectId(style_id)}, {"$set": style.dict()})
+        db.style.update_one({"_id": ObjectId(style_id)}, {"$set": style.dict()})
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Style updated")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not updated")

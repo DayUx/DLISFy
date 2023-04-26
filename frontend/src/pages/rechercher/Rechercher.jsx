@@ -18,6 +18,7 @@ import Artists from "../../components/artists/Artists.jsx";
 import { utils } from "../../utils/_helper.jsx";
 import { useLocation } from "react-router-dom";
 import Styles from "../../components/styles/Styles.jsx";
+import Albums from "../../components/albums/Albums.jsx";
 const { Text, Title, Link } = Typography;
 const { Content } = Layout;
 const { Search } = Input;
@@ -25,6 +26,7 @@ const { Search } = Input;
 const Rechercher = forwardRef(({ playMusic = function () {} }, ref) => {
   const [musiques, setMusiques] = useState([]);
   const [artistes, setArtistes] = useState([]);
+  const [albums, setAlbums] = useState([]);
   const [styles, setStyles] = useState([]);
   const [filter, setFilter] = useState("Tout");
   const searchRef = useRef(null);
@@ -51,6 +53,11 @@ const Rechercher = forwardRef(({ playMusic = function () {} }, ref) => {
     get(API.searchStyles + "/" + value, {
       success: (data) => {
         setStyles(data);
+      },
+    });
+    get(API.searchAlbums + "/" + value, {
+      success: (data) => {
+        setAlbums(data);
       },
     });
   };
@@ -94,6 +101,9 @@ const Rechercher = forwardRef(({ playMusic = function () {} }, ref) => {
         {(filter === "Tout" || filter === "Artistes") &&
         artistes?.length > 0 ? (
           <Artists artists={artistes} />
+        ) : null}
+        {(filter === "Tout" || filter === "Albums") && albums?.length > 0 ? (
+          <Albums albums={albums} />
         ) : null}
         {(filter === "Tout" || filter === "Genres") && styles?.length > 0 ? (
           <Styles styles={styles} />

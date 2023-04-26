@@ -17,9 +17,12 @@ export const API = {
   streamMusique: API_URL + "stream/song",
   getMusiquesByArtisteId: API_URL + "music/song/artist",
   getMusiquesByStyleId: API_URL + "music/song/style",
+  getMusiquesByAlbumId: API_URL + "music/song/album",
   searchAlbums: API_URL + "music/album/search",
   createAlbum: API_URL + "admin/album",
   updateAlbum: API_URL + "admin/album",
   getAlbumById: API_URL + "music/album/id",
   getAlbumsByArtisteId: API_URL + "music/album/artist",
+  getLikesId: API_URL + "music/songid/likes",
+  like: API_URL + "music/song/like",
 };

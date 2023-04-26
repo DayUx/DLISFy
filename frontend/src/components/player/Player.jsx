@@ -37,16 +37,11 @@ const Player = forwardRef(({}, ref) => {
     localStorage.setItem("volume", volume);
   }, [volume]);
 
-  const [song, setSong] = useState({
-    title: null,
-    artists: [],
-    image: null,
-  });
+  const [song, setSong] = useState();
 
   useEffect(() => {
     get(API.getMusiqueById + "/" + songPlaying.id, {
       success: (data) => {
-        console.log("get musique", data);
         setSong({
           ...data,
         });
@@ -100,12 +95,14 @@ const Player = forwardRef(({}, ref) => {
       id: songPlaying.titles[index - 1].titleId,
     });
   };
+
   const next = () => {
     if (nextDisabled()) return;
     const index = songPlaying.titles.findIndex(
       (t) => t.titleId === songPlaying.id
     );
     console.log("next", index);
+    console.log("next", songPlaying);
     publish("play", {
       ...songPlaying,
       id: songPlaying.titles[index + 1].titleId,
@@ -130,20 +127,7 @@ const Player = forwardRef(({}, ref) => {
       <audio
         ref={audioRef}
         onEnded={() => {
-          const index = songPlaying.titles.findIndex(
-            (t) => t.titleId === songPlaying.id
-          );
-
-          console.log("next", index);
-          if (index + 1 === songPlaying.titles.length) {
-            publish("pause", { id: songPlaying.artistId });
-            return;
-          }
-          publish("play", {
-            id: songPlaying.titles[index + 1]?.titleId,
-            artistId: songPlaying.artistId,
-            titles: songPlaying.titles,
-          });
+          next();
         }}
         src={
           API.streamMusique +
@@ -154,14 +138,7 @@ const Player = forwardRef(({}, ref) => {
       ></audio>
       <Row align={"middle"}>
         <Col span={8}>
-          <SongPreview
-            song={{
-              title: song.title,
-              artists: song.artists,
-              image: song.image,
-              duration: song.duration,
-            }}
-          ></SongPreview>
+          <SongPreview song={song}></SongPreview>
         </Col>
         <Col span={8}>
           <Space
@@ -209,7 +186,7 @@ const Player = forwardRef(({}, ref) => {
               audioRef.current.currentTime = time;
             }}
             currentTime={currentTime}
-            endTime={song.duration}
+            endTime={song?.duration}
           ></Timer>
         </Col>
         <Col offset={2} span={4}>

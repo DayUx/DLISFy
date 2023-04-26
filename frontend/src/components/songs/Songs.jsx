@@ -1,12 +1,20 @@
 import { Button, Card, Image, Space, Layout, Typography, Row, Col } from "antd";
-import { CaretRightOutlined, PauseOutlined } from "@ant-design/icons";
+import {
+  CaretRightOutlined,
+  HeartFilled,
+  HeartOutlined,
+  PauseOutlined,
+} from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
-import { publish, subscribe } from "../../utils/events.jsx";
+import { publish, subscribe, unsubscribe } from "../../utils/events.jsx";
 import ArtistLink from "../link/ArtistLink.jsx";
+import { API } from "../../utils/API.jsx";
+import { get, post } from "../../utils/CustomRequests.jsx";
 
 const Songs = ({ songs }) => {
   const [playingId, setPlayingId] = useState(null);
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
+  const [likes, setLikes] = useState([]);
 
   function getCurrentDimension() {
     return {
@@ -14,6 +22,17 @@ const Songs = ({ songs }) => {
       height: window.innerHeight,
     };
   }
+
+  useEffect(() => {
+    const updateLikes = (e) => {
+      setLikes(e.detail);
+    };
+    subscribe("like", updateLikes);
+    return () => {
+      unsubscribe("like", updateLikes);
+    };
+  }, [likes]);
+
   useEffect(() => {
     const updateDimension = () => {
       setScreenSize(getCurrentDimension());
@@ -41,7 +60,18 @@ const Songs = ({ songs }) => {
     subscribe("pause", (e) => {
       setPlayingId(null);
     });
+
+    getLikes();
   }, []);
+
+  const getLikes = () => {
+    get(API.getLikesId, {
+      success: (data) => {
+        setLikes(data);
+      },
+    });
+  };
+
   const onClickPlay = (id, data) => {
     if (playingId === id) {
       publish("pause", {
@@ -167,22 +197,44 @@ const Songs = ({ songs }) => {
                         </Layout.Content>
                       </Space>
                     </Space>
+                    <Space>
+                      <Button
+                        shape={"circle"}
+                        type={"link"}
+                        size={"large"}
+                        onClick={() => {
+                          post(API.like + "/" + musique._id, {
+                            success: (data) => {
+                              publish("like", data);
+                            },
+                          });
+                        }}
+                        icon={
+                          likes.find((id) => id === musique._id) ? (
+                            <HeartFilled />
+                          ) : (
+                            <HeartOutlined />
+                          )
+                        }
+                        ghost
+                      />
 
-                    <Button
-                      shape={"circle"}
-                      type={"primary"}
-                      ghost
-                      icon={
-                        playingId === musique._id ? (
-                          <PauseOutlined />
-                        ) : (
-                          <CaretRightOutlined />
-                        )
-                      }
-                      onClick={() => {
-                        onClickPlay(musique._id, musique.data);
-                      }}
-                    ></Button>
+                      <Button
+                        shape={"circle"}
+                        type={"primary"}
+                        ghost
+                        icon={
+                          playingId === musique._id ? (
+                            <PauseOutlined />
+                          ) : (
+                            <CaretRightOutlined />
+                          )
+                        }
+                        onClick={() => {
+                          onClickPlay(musique._id, musique.data);
+                        }}
+                      ></Button>
+                    </Space>
                   </Layout.Content>
                 </Layout.Content>
               </Card>
