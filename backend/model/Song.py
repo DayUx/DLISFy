@@ -86,3 +86,33 @@ class SongModelLite(BaseModel):
                 "styles": ["sddsd4VSDvd", "sdvds5vsdv22"]
             }
         }
+
+
+class SongModelYoutube(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    title: Optional[str] =None
+    artists: list = Field(default_factory=list)
+    album: Optional[str] = None
+    data: str = Field(...)
+    duration: Optional[int] = None
+    numberPlay: Optional[int] = None
+    styles: list = Field(default_factory=list)
+    image: Optional[str]=None
+    type: Optional[str]=None
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        exclude_unset = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "title": "Song 1",
+                "artists": ["Artist 1", "Artist 2"],
+                "album": "Album 1",
+                "rate": 5,
+                "data": ["5d12d1f", "d12fd1f5", "5d5fd1f2"],
+                "numberPlay": 0,
+                "styles": ["sddsd4VSDvd", "sdvds5vsdv22"]
+            }
+        }

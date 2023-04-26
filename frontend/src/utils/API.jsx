@@ -25,4 +25,5 @@ export const API = {
   getAlbumsByArtisteId: API_URL + "music/album/artist",
   getLikesId: API_URL + "music/songid/likes",
   like: API_URL + "music/song/like",
+  uploadFromYoutube: API_URL + "admin/song/youtube",
 };

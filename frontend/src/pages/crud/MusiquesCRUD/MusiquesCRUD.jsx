@@ -84,7 +84,6 @@ const MusiquesCRUD = () => {
     const reader = new FileReader();
     reader.readAsDataURL(music[0]);
     reader.onload = () => {
-      debugger;
       post(API.createMusique, {
         body: {
           image: imageUrl,
@@ -170,7 +169,7 @@ const MusiquesCRUD = () => {
         height: "100vh",
       }}
     >
-      <audio ref={audioRef} src={playingData}></audio>
+      <audio src={playingData} ref={audioRef}></audio>
       <Content
         style={{
           flex: 1,
@@ -327,13 +326,7 @@ const MusiquesCRUD = () => {
                           });
                           return false;
                         }
-                        if (file.size / 1024 / 1024 > 5) {
-                          notification.error({
-                            message: "Erreur",
-                            description: "Le fichier ne doit pas dépasser 5Mo",
-                          });
-                          return false;
-                        }
+
                         const reader = new FileReader();
                         reader.readAsDataURL(file);
                         reader.onload = () => {
@@ -498,7 +491,15 @@ const MusiquesCRUD = () => {
             <Input placeholder={"Titre"}></Input>
           </Form.Item>
           <Form.Item name={"album"}>
-            <Select placeholder={"Album"}></Select>
+            <Select
+              placeholder={"Album"}
+              options={albums?.map((album) => {
+                return {
+                  label: album.title,
+                  value: album._id,
+                };
+              })}
+            ></Select>
           </Form.Item>
           <Form.Item
             name={"artists"}

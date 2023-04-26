@@ -47,7 +47,9 @@ const Player = forwardRef(({}, ref) => {
         });
       },
     });
-    audioRef.current?.play();
+    if (isPlaying) {
+      audioRef.current?.play();
+    }
   }, [songPlaying.id]);
 
   const play = (e) => {
