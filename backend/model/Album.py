@@ -7,7 +7,7 @@ class AlbumModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     title: str = Field(...)
     year: int = Field(...)
-    artist: str = Field(...)
+    artists: list = Field(default_factory=list)
     image: str = Field(...)
     class Config:
         allow_population_by_field_name = True
@@ -23,8 +23,8 @@ class AlbumModel(BaseModel):
 class UpdateAlbumModel(BaseModel):
     title:Optional[str]
     year:Optional[int]
-    artist:Optional[str]
-    image: str = Field(...)
+    artists:Optional[list]
+    image: Optional[str]
 
     class Config:
         allow_population_by_field_name = True

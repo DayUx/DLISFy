@@ -126,7 +126,7 @@ async def deleteSong(song_id:str):
 @router.post("/album", )
 async def addAlbum(album: AlbumModel):
     try:
-        await db.album.insert_one(album.dict())
+        db.album.insert_one(album.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Album added")
     except:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Album not added")
@@ -134,9 +134,9 @@ async def addAlbum(album: AlbumModel):
 @router.put("/album/{album_id}", )
 async def updateAlbum(album_id:str, album: AlbumModel):
     try:
-        await db.album.update_one({"_id": ObjectId(album_id)}, {"$set": album.dict()})
+        db.album.update_one({"_id": ObjectId(album_id)}, {"$set": album.dict()})
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Album updated")
-    except:
+    except Exception as e:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Album not updated")
 @router.post("/style", )
 async def addStyle(style: StyleModel):

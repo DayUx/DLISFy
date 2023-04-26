@@ -19,15 +19,19 @@ const Player = forwardRef(({}, ref) => {
 
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(localStorage.getItem("volume") || 50);
-  const [songPlaying, setSongPlaying] = useState({
-    id: null,
-    albumId: null,
-    playlistId: null,
-    artistId: null,
-    styleId: null,
-    likes: null,
-    titles: [],
-  });
+  const [songPlaying, setSongPlaying] = useState(
+    (localStorage.getItem("songPlaying")
+      ? JSON.parse(localStorage.getItem("songPlaying"))
+      : null) || {
+      id: null,
+      albumId: null,
+      playlistId: null,
+      artistId: null,
+      styleId: null,
+      likes: null,
+      titles: [],
+    }
+  );
 
   useEffect(() => {
     localStorage.setItem("volume", volume);
@@ -66,6 +70,7 @@ const Player = forwardRef(({}, ref) => {
 
   useEffect(() => {
     subscribe("play", play);
+    localStorage.setItem("songPlaying", JSON.stringify(songPlaying));
     return () => {
       unsubscribe("play", play);
     };
@@ -210,6 +215,7 @@ const Player = forwardRef(({}, ref) => {
         <Col offset={2} span={4}>
           <Volume
             onChange={(value) => {
+              console.log("volume", value / 100);
               audioRef.current.volume = value / 100;
               setVolume(value);
             }}

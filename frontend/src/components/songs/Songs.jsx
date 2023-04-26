@@ -100,13 +100,13 @@ const Songs = ({ songs }) => {
           }
           return (
             <Col
+              key={index}
               style={{
                 marginBottom: 10,
               }}
               span={24 / max}
             >
               <Card
-                key={index}
                 style={{
                   width: "100%",
                   padding: 0,
@@ -153,7 +153,7 @@ const Songs = ({ songs }) => {
                         <Layout.Content>
                           {musique?.artists?.map((artiste, index, grid) => {
                             return (
-                              <>
+                              <Layout.Content key={index}>
                                 <ArtistLink
                                   key={index}
                                   id={artiste}
@@ -161,7 +161,7 @@ const Songs = ({ songs }) => {
                                 {index < grid.length && grid.length !== 1
                                   ? ","
                                   : null}
-                              </>
+                              </Layout.Content>
                             );
                           })}
                         </Layout.Content>

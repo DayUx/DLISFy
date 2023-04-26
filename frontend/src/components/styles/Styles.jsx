@@ -116,13 +116,13 @@ const Styles = ({ styles }) => {
           }
           return (
             <Col
+              key={index}
               style={{
                 marginBottom: 10,
               }}
               span={24 / max}
             >
               <Card
-                key={index}
                 style={{
                   aspectRatio: 1,
                   padding: 0,
@@ -135,7 +135,7 @@ const Styles = ({ styles }) => {
                 <Typography.Title
                   style={{
                     color: "white",
-                    filter: "drop-shadow(1px 1px 5px black)",
+                    filter: "drop-shadow(0px 0px 5px black)",
                   }}
                   level={3}
                   strong
@@ -150,7 +150,7 @@ const Styles = ({ styles }) => {
                     position: "absolute",
                     bottom: 10,
                     right: 10,
-                    filter: "drop-shadow(1px 1px 5px black)",
+                    filter: "drop-shadow(0px 0px 5px black)",
                   }}
                   icon={
                     playingId === style._id ? (

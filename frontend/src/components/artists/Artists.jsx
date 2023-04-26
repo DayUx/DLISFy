@@ -112,6 +112,8 @@ const Artists = ({ artists }) => {
                   size={"large"}
                   type={"primary"}
                   style={{
+                    filter: "drop-shadow(0px 0px 5px black)",
+
                     position: "absolute",
                     top: "0",
                     transform: "translateY(-50%)",

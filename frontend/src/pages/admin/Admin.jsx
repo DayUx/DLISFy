@@ -33,6 +33,7 @@ import ArtistesCRUD from "../crud/ArtistesCRUD/ArtistesCRUD.jsx";
 import MusiquesCRUD from "../crud/MusiquesCRUD/MusiquesCRUD.jsx";
 import StylesCRUD from "../crud/StylesCRUD/StylesCRUD.jsx";
 import { get } from "../../utils/CustomRequests.jsx";
+import AlbumsCRUD from "../crud/AlbumsCRUD/AlbumsCRUD.jsx";
 
 const { Sider, Header, Content, Footer } = Layout;
 const { Text, Title, Link } = Typography;
@@ -144,7 +145,7 @@ const Admin = () => {
           <Layout className="site-layout">
             <Content>
               <Routes>
-                <Route path="/albums" element={<div>albums</div>} />
+                <Route path="/albums" element={<AlbumsCRUD />} />
                 <Route path="/artistes" element={<ArtistesCRUD />} />
                 <Route path="/musiques" element={<MusiquesCRUD />} />
                 <Route path="/styles" element={<StylesCRUD />} />

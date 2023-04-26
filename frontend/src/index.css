@@ -18,3 +18,15 @@ body {
 .hover-opacity:hover {
   opacity: 0.7;
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #666;
+}

@@ -94,7 +94,7 @@ const StylesCRUD = () => {
           {styles.map((style, index, array) => {
             return (
               <Card
-                key={style.id}
+                key={index}
                 style={{
                   width: "100%",
                   padding: 0,

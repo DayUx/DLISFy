@@ -9,6 +9,10 @@ import {
   Upload,
   Typography,
   Image,
+  FloatButton,
+  Modal,
+  Select,
+  InputNumber,
 } from "antd";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -24,9 +28,11 @@ import { get, post, put } from "../../../utils/CustomRequests.jsx";
 const { Footer, Content } = Layout;
 const { Search } = Input;
 const { Text } = Typography;
-const ArtistesCRUD = () => {
+const AlbumsCRUD = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setUploading] = useState(false);
+  const [albums, setAlbums] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [artistes, setArtistes] = useState([]);
 
   const searchRef = useRef(null);
@@ -37,32 +43,38 @@ const ArtistesCRUD = () => {
   };
   useEffect(() => {
     onSearch(".*");
+    get(API.searchArtistes + "/.*", {
+      success: (data) => {
+        setArtistes(data);
+      },
+    });
   }, []);
 
   const onFinish = (values) => {
-    post(API.createArtiste, {
+    post(API.createAlbum, {
       body: {
         image: imageUrl,
-        name: values.name,
+        title: values.title,
+        artists: values.artists,
+        year: values.year,
       },
       success: (data) => {
         onSearch(searchRef.current.input.value);
-        setImageUrl("");
+        setIsModalVisible(false);
       },
-      successMessage: "L'artiste a bien été créé",
+      successMessage: "L'album a bien été créé",
     });
   };
 
-  const updateArtiste = (artiste) => {
-    put(API.updateArtiste + "/" + artiste._id, {
-      body: {
-        name: artiste.name,
-        image: artiste.image,
-      },
-      success: (data) => {
+  const updateAlbum = (album) => {
+    put(API.updateAlbum + "/" + album._id, {
+      body: album,
+      success: () => {
+        console.log("success");
         onSearch(searchRef.current.input.value);
       },
-      successMessage: "L'artiste a bien été modifié",
+
+      successMessage: "L'album a bien été modifié",
     });
   };
 
@@ -70,9 +82,9 @@ const ArtistesCRUD = () => {
     if (!value) {
       value = ".*";
     }
-    get(API.searchArtistes + "/" + value, {
+    get(API.searchAlbums + "/" + value, {
       success: (data) => {
-        setArtistes(data);
+        setAlbums(data);
       },
     });
   };
@@ -95,7 +107,7 @@ const ArtistesCRUD = () => {
             marginTop: 30,
           }}
         >
-          {artistes.map((artiste, index, array) => {
+          {albums.map((artiste, index, array) => {
             return (
               <Card
                 key={index}
@@ -153,7 +165,7 @@ const ArtistesCRUD = () => {
                         reader.readAsDataURL(file);
                         reader.onload = () => {
                           artiste.image = reader.result;
-                          updateArtiste(artiste);
+                          updateAlbum(artiste);
                         };
                         return false;
                       }}
@@ -174,13 +186,38 @@ const ArtistesCRUD = () => {
                     <Text
                       editable={{
                         onChange: (value) => {
-                          artiste.name = value;
-                          updateArtiste(artiste);
+                          artiste.title = value;
+                          updateAlbum(artiste);
                         },
                       }}
                       strong
                     >
-                      {artiste.name}
+                      {artiste.title}
+                    </Text>
+                    <Select
+                      mode="multiple"
+                      style={{ width: "100%" }}
+                      options={artistes.map((artiste) => {
+                        return {
+                          value: artiste._id,
+                          label: artiste.name,
+                        };
+                      })}
+                      onChange={(value) => {
+                        artiste.artists = value;
+                        updateAlbum(artiste);
+                      }}
+                      value={artiste.artists}
+                    ></Select>
+                    <Text
+                      editable={{
+                        onChange: (value) => {
+                          artiste.year = value;
+                          updateAlbum(artiste);
+                        },
+                      }}
+                    >
+                      {artiste.year}
                     </Text>
                   </Space>
                 </Content>
@@ -189,13 +226,38 @@ const ArtistesCRUD = () => {
           })}
         </Space>
       </Content>
-      <Footer
-        style={{
-          borderTop: "var(--border)",
+      <FloatButton
+        type={"primary"}
+        onClick={() => setIsModalVisible(true)}
+        icon={<PlusOutlined />}
+      ></FloatButton>
+      <Modal
+        open={isModalVisible}
+        onCancel={() => {
+          setIsModalVisible(false);
         }}
+        centered={true}
+        footer={[
+          <Button
+            form={"formAlbums"}
+            key={"submit"}
+            htmlType={"submit"}
+            type={"primary"}
+          >
+            Ajouter
+          </Button>,
+          <Button
+            onClick={() => {
+              setIsModalVisible(false);
+            }}
+          >
+            Fermer
+          </Button>,
+        ]}
       >
         <Form
           onFinish={onFinish}
+          id={"formAlbums"}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -211,28 +273,19 @@ const ArtistesCRUD = () => {
               alignItems: "center",
               justifyContent: "center",
             }}
+            rules={[
+              {
+                required: true,
+                message: "Veuillez saisir une couverture d'album",
+              },
+            ]}
           >
             <Upload
               listType="picture-card"
               className="avatar-uploader"
               showUploadList={false}
+              accept={"image/*"}
               beforeUpload={(file) => {
-                if (file.type !== "image/jpeg" && file.type !== "image/png") {
-                  notification.error({
-                    message: "Erreur",
-                    description: "Le fichier doit être au format .jpg ou .png",
-                  });
-                  setUploading(false);
-                  return false;
-                }
-                if (file.size / 1024 / 1024 > 2) {
-                  notification.error({
-                    message: "Erreur",
-                    description: "Le fichier ne doit pas dépasser 2Mo",
-                  });
-                  setUploading(false);
-                  return false;
-                }
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = () => {
@@ -252,29 +305,61 @@ const ArtistesCRUD = () => {
               ) : (
                 <div>
                   {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                  <div style={{ marginTop: 8 }}>Photo de profil</div>
+                  <div style={{ marginTop: 8 }}>Couverture d'album</div>
                 </div>
               )}
             </Upload>
           </Form.Item>
           <Form.Item
-            name={"name"}
+            name={"title"}
             rules={[
               {
                 required: true,
-                message: "Veuillez entrer un nom",
+                message: "Veuillez saisir un titre",
               },
             ]}
           >
-            <Input placeholder="Nom" />
+            <Input placeholder="Titre" />
           </Form.Item>
-          <Button type="primary" htmlType="submit">
-            Ajouter un artiste
-          </Button>
+          <Form.Item
+            name={"artists"}
+            rules={[
+              {
+                required: true,
+                message: "Veuillez choisir au moins un artiste",
+              },
+            ]}
+          >
+            <Select
+              mode="multiple"
+              style={{ width: "100%" }}
+              placeholder="Artiste(s)"
+              filterOption={(input, option) =>
+                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+              options={artistes.map((artist) => {
+                return {
+                  label: artist.name,
+                  value: artist._id,
+                };
+              })}
+            ></Select>
+          </Form.Item>
+          <Form.Item
+            name={"year"}
+            rules={[
+              {
+                required: true,
+                message: "Veuillez saisir une année",
+              },
+            ]}
+          >
+            <InputNumber placeholder="Année" />
+          </Form.Item>
         </Form>
-      </Footer>
+      </Modal>
     </Layout>
   );
 };
 
-export default ArtistesCRUD;
+export default AlbumsCRUD;

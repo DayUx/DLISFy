@@ -12,6 +12,8 @@ import {
   Select,
   Tooltip,
   Segmented,
+  Modal,
+  FloatButton,
 } from "antd";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -35,6 +37,7 @@ const MusiquesCRUD = () => {
   const [loading, setUploading] = useState(false);
   const [musiques, setMusiques] = useState([]);
   const [artistes, setArtistes] = useState([]);
+  const [albums, setAlbums] = useState([]);
   const [styles, setStyles] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playingId, setPlayingId] = useState(null);
@@ -43,6 +46,16 @@ const MusiquesCRUD = () => {
   const [selectedArtiste, setSelectedArtiste] = useState([]);
   const [music, setMusic] = useState([]);
   const audioRef = useRef(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const formRef = useRef(null);
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    form.resetFields();
+    setMusic([]);
+    setImageUrl("");
+  }, [isModalVisible]);
+
   const handleChange = (info) => {
     if (info.file.status === "uploading") {
       setUploading(true);
@@ -58,6 +71,11 @@ const MusiquesCRUD = () => {
     get(API.searchStyles + "/" + ".*", {
       success: (data) => {
         setStyles(data);
+      },
+    });
+    get(API.searchAlbums + "/" + ".*", {
+      success: (data) => {
+        setAlbums(data);
       },
     });
   }, []);
@@ -78,10 +96,12 @@ const MusiquesCRUD = () => {
           type: music[0].type,
         },
         success: (data) => {
+          notification.success({
+            message: "La musique a bien été créé",
+          });
           onSearch(searchRef.current.input.value);
           setImageUrl("");
         },
-        successMessage: "La musique a bien été créé",
       });
     };
   };
@@ -153,16 +173,23 @@ const MusiquesCRUD = () => {
       <audio ref={audioRef} src={playingData}></audio>
       <Content
         style={{
-          padding: "30px 30px 0 30px",
           flex: 1,
           display: "flex",
           flexDirection: "column",
         }}
       >
-        <Search ref={searchRef} onSearch={onSearch}></Search>
+        <Search
+          style={{
+            padding: "30px 30px 0 30px",
+          }}
+          ref={searchRef}
+          onSearch={onSearch}
+        ></Search>
         <Space
           direction={"vertical"}
           style={{
+            padding: "30px 30px 0 30px",
+
             width: "100%",
             marginTop: 30,
             flex: 1,
@@ -192,11 +219,13 @@ const MusiquesCRUD = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Space
+                  <Content
                     style={{
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
+                      width: "100%",
+                      gap: 10,
                     }}
                   >
                     <Upload
@@ -253,10 +282,34 @@ const MusiquesCRUD = () => {
                           updateMusique(musique);
                         },
                       }}
+                      style={{
+                        flex: 1,
+                      }}
                       strong
                     >
                       {musique.title}
                     </Text>
+                    <Select
+                      style={{
+                        flex: 1,
+                      }}
+                      onClear={() => {
+                        musique.album = null;
+                        updateMusique(musique);
+                      }}
+                      allowClear={true}
+                      value={musique.album}
+                      options={albums.map((album) => {
+                        return {
+                          label: album.title,
+                          value: album._id,
+                        };
+                      })}
+                      onChange={(value) => {
+                        musique.album = value;
+                        updateMusique(musique);
+                      }}
+                    ></Select>
                     <Upload
                       showUploadList={false}
                       beforeUpload={(file) => {
@@ -308,20 +361,47 @@ const MusiquesCRUD = () => {
                         onClickPlay(musique._id, musique.data);
                       }}
                     ></Button>
-                  </Space>
+                  </Content>
                 </Content>
               </Card>
             );
           })}
         </Space>
       </Content>
-      <Footer
-        style={{
-          borderTop: "var(--border)",
+      <FloatButton
+        type={"primary"}
+        onClick={() => setIsModalVisible(true)}
+        icon={<PlusOutlined />}
+      ></FloatButton>
+      <Modal
+        open={isModalVisible}
+        onCancel={() => {
+          setIsModalVisible(false);
         }}
+        centered={true}
+        footer={[
+          <Button
+            form={"formMusiques"}
+            key={"submit"}
+            htmlType={"submit"}
+            type={"primary"}
+          >
+            Ajouter
+          </Button>,
+          <Button
+            onClick={() => {
+              setIsModalVisible(false);
+            }}
+          >
+            Fermer
+          </Button>,
+        ]}
       >
         <Form
           onFinish={onFinish}
+          ref={formRef}
+          id={"formMusiques"}
+          form={form}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -468,11 +548,8 @@ const MusiquesCRUD = () => {
               })}
             ></Select>
           </Form.Item>
-          <Button type="primary" htmlType="submit">
-            Ajouter une musique
-          </Button>
         </Form>
-      </Footer>
+      </Modal>
     </Layout>
   );
 };
