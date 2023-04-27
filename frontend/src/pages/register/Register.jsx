@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
 import { API } from "../../utils/API.jsx";
 import { post } from "../../utils/CustomRequests.jsx";
+import logo from "../../assets/logo.svg";
 const { Option } = Select;
 const { Text, Link } = Typography;
 
@@ -64,6 +65,14 @@ const Register = () => {
           maxWidth: "500px",
         }}
       >
+        <div
+          style={{
+            width: "100%",
+            padding: 30,
+          }}
+        >
+          <img width={"100%"} alt={"logo"} src={logo} />
+        </div>
         <Form
           form={form}
           name="register"

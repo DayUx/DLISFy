@@ -11,7 +11,7 @@ import { get } from "../../utils/CustomRequests.jsx";
 import ArtistLink from "../link/ArtistLink.jsx";
 import { BsDot } from "react-icons/all.js";
 
-const Albums = ({ albums }) => {
+const Albums = ({ albums, showAll }) => {
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
 
   const [playingId, setPlayingId] = useState(null);
@@ -81,7 +81,7 @@ const Albums = ({ albums }) => {
           if (max > 8) {
             max = 8;
           }
-          if (index >= max) {
+          if (index >= max && !showAll) {
             return null;
           }
           return (

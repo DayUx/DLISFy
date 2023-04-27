@@ -18,7 +18,7 @@ const ArtistLink = ({ id }) => {
   return (
     <Link
       onClick={() => {
-        navigate("/artist/" + id);
+        // navigate("/artist/" + id);
       }}
     >
       {name}

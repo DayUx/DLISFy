@@ -18,16 +18,23 @@ import {
   HeartFilled,
   BookFilled,
   HomeFilled,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  DisconnectOutlined,
 } from "@ant-design/icons";
 import {
   Button,
+  Col,
   ConfigProvider,
   Layout,
   Menu,
+  Modal,
   notification,
+  Row,
   Space,
   Switch,
   theme,
+  Tooltip,
   Typography,
 } from "antd";
 import Timer from "./components/player/timer/Timer.jsx";
@@ -50,12 +57,30 @@ function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("0");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [user, setUser] = useState(null);
+  const [openUserModal, setOpenUserModal] = useState(false);
   utils.navigate = useNavigate();
   utils.location = useLocation();
+  const location = useLocation();
   const playerRef = useRef();
   useEffect(() => {
     utils.player = playerRef;
   }, [playerRef]);
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+  useEffect(() => {
+    for (const item of items) {
+      if (utils.location.pathname === item.url) {
+        setSelectedKey(item.key);
+      }
+    }
+    get(API.getUser, {
+      success: (data) => {
+        setUser(data);
+      },
+    });
+  }, []);
 
   useEffect(() => {
     for (const item of items) {
@@ -63,7 +88,7 @@ function App() {
         setSelectedKey(item.key);
       }
     }
-  }, []);
+  }, [location]);
 
   const checkToken = (element) => {
     if (!localStorage.getItem("token")) {
@@ -104,6 +129,50 @@ function App() {
         algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
       }}
     >
+      <Modal
+        onCancel={() => {
+          setOpenUserModal(false);
+        }}
+        centered={true}
+        open={openUserModal}
+        footer={[
+          <Button
+            onClick={() => {
+              setOpenUserModal(false);
+            }}
+          >
+            Fermer
+          </Button>,
+        ]}
+      >
+        <Space
+          size={20}
+          style={{
+            justifyContent: "center",
+            textAlign: "center",
+            width: "100%",
+          }}
+          direction={"vertical"}
+        >
+          <Typography.Title strong={true} level={4}>
+            Bienvenue à vous {user?.username}
+          </Typography.Title>
+          <Typography.Text>{user?.email}</Typography.Text>
+          <Tooltip title={"Se déconnecter"}>
+            <Button
+              danger={true}
+              type={"primary"}
+              size={"large"}
+              onClick={() => {
+                localStorage.removeItem("access_token");
+                utils.navigate("/login");
+              }}
+              icon={<DisconnectOutlined></DisconnectOutlined>}
+              shape={"circle"}
+            ></Button>
+          </Tooltip>
+        </Space>
+      </Modal>
       <Layout style={{ height: "100vh" }}>
         <Layout style={{ height: "100%" }}>
           <Sider
@@ -161,6 +230,43 @@ function App() {
             </div>
           </Sider>
           <Layout className="site-layout">
+            <Header
+              style={{
+                background: isDarkMode ? "" : "#fff",
+                padding: "0 30px",
+              }}
+              theme={isDarkMode ? "dark" : "light"}
+            >
+              <Row>
+                <Col flex={1}>
+                  <Space>
+                    <Button
+                      onClick={() => {
+                        utils.navigate(-1);
+                      }}
+                      shape={"circle"}
+                      icon={<ArrowLeftOutlined></ArrowLeftOutlined>}
+                    ></Button>{" "}
+                    <Button
+                      shape={"circle"}
+                      onClick={() => {
+                        utils.navigate(1);
+                      }}
+                      icon={<ArrowRightOutlined></ArrowRightOutlined>}
+                    ></Button>
+                  </Space>
+                </Col>
+                <Col>
+                  <Button
+                    shape={"circle"}
+                    onClick={() => {
+                      setOpenUserModal(true);
+                    }}
+                    icon={<UserOutlined></UserOutlined>}
+                  ></Button>
+                </Col>
+              </Row>
+            </Header>
             <Content>
               <Routes>
                 <Route path="/bibliotheque" element={<Bibliotheque />} />

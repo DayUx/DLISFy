@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import dependencies
-from .internal import admin
-from .routers import auth, music, stream
+from backend.routers import dependencies
+from backend.routers.private import admin
+from backend.routers.public import music, stream, auth
 from dotenv import load_dotenv,find_dotenv
 load_dotenv(find_dotenv())
 app = FastAPI()

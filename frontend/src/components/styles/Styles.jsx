@@ -6,7 +6,7 @@ import ArtistLink from "../link/ArtistLink.jsx";
 import { get } from "../../utils/CustomRequests.jsx";
 import { API } from "../../utils/API.jsx";
 
-const Styles = ({ styles }) => {
+const Styles = ({ styles, showAll }) => {
   const [playingId, setPlayingId] = useState(null);
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
   const [stylesList, setStylesList] = useState([]);
@@ -111,7 +111,7 @@ const Styles = ({ styles }) => {
           if (max > 8) {
             max = 8;
           }
-          if (index >= max * 4) {
+          if (index >= max * 4 && !showAll) {
             return null;
           }
           return (

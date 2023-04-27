@@ -1,5 +1,6 @@
 import React from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+
 import {
   Button,
   Card,
@@ -14,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { API } from "../../utils/API.jsx";
 import { post } from "../../utils/CustomRequests.jsx";
+import logo from "../../assets/logo.svg";
 
 const { Content } = Layout;
 const { Text, Link } = Typography;
@@ -48,6 +50,14 @@ const Login = () => {
           maxWidth: "500px",
         }}
       >
+        <div
+          style={{
+            width: "100%",
+            padding: 30,
+          }}
+        >
+          <img width={"100%"} alt={"logo"} src={logo} />
+        </div>
         <Form
           name="normal_login"
           className="login-form"

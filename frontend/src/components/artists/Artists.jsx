@@ -5,7 +5,7 @@ import { publish, subscribe } from "../../utils/events.jsx";
 import { API } from "../../utils/API.jsx";
 import { get } from "../../utils/CustomRequests.jsx";
 
-const Artists = ({ artists }) => {
+const Artists = ({ artists, showAll }) => {
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
 
   const [playingId, setPlayingId] = useState(null);
@@ -75,7 +75,7 @@ const Artists = ({ artists }) => {
           if (max > 8) {
             max = 8;
           }
-          if (index >= max) {
+          if (index >= max && !showAll) {
             return null;
           }
           return (

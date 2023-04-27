@@ -20,6 +20,9 @@ from backend.model.Song import SongModel,SongModelLite
 from backend.model.Style import StyleModel
 import motor.motor_asyncio
 from jose import JWTError, jwt
+
+from backend.model.User import UserModelOut
+
 SECRET_KEY="09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM="HS256"
 
@@ -78,13 +81,7 @@ async def searchArtists(artist_name:str):
         print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Artist not found")
 
-@router.get("/song/{page_number}", response_model=list[SongModel])
-async def getSongs(page_number:int):
-    try:
-        song =  db.song.find().skip((page_number-1)*100).limit(100)
-        return song
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not found")
+
 @router.get("/song/id/{song_id}", response_model=SongModel)
 async def getSongById(song_id:str):
     try:
@@ -138,7 +135,8 @@ async def getSongsByLikes(x_token: str = Header("X-Token")):
     try:
         payload = jwt.decode(x_token, SECRET_KEY, algorithms=[ALGORITHM])
         user = db.user.find_one({"_id": ObjectId(payload.get("sub"))})
-        songs =  db.song.find({"_id": {"$in": user.get("likes")}})
+        likes = list(map(lambda likeId: ObjectId(likeId),user.get("likes")))
+        songs = [doc for doc in db.song.find({"_id": {"$in": likes}})]
         return songs
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Songs not found")
@@ -227,3 +225,12 @@ async def searchStyles(style_name:str):
     except Exception as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not found")
+@router.get("/user",response_model=UserModelOut)
+async def getUser(x_token: str = Header("X-Token")):
+    try:
+        payload = jwt.decode(x_token, SECRET_KEY, algorithms=[ALGORITHM])
+        user = db.user.find_one({"_id": ObjectId(payload.get("sub"))},{"password":0})
+        return user
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")

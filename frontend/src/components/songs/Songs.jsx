@@ -11,7 +11,7 @@ import ArtistLink from "../link/ArtistLink.jsx";
 import { API } from "../../utils/API.jsx";
 import { get, post } from "../../utils/CustomRequests.jsx";
 
-const Songs = ({ songs }) => {
+const Songs = ({ songs, showAll }) => {
   const [playingId, setPlayingId] = useState(null);
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
   const [likes, setLikes] = useState([]);
@@ -125,7 +125,7 @@ const Songs = ({ songs }) => {
           if (max > 8) {
             max = 8;
           }
-          if (index >= max * 4) {
+          if (index >= 20 && !showAll) {
             return null;
           }
           return (
