@@ -38,17 +38,9 @@ app.include_router(
     stream.router,
     prefix="/stream",
     tags=["app"],
-    # dependencies=[Depends(dependencies.isTokenValid)],
+    dependencies=[Depends(dependencies.isTokenValid)],
     responses={418: {"description": "I'm a teapot"}},
 )
-
-
-
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}

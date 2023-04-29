@@ -11,6 +11,8 @@ import {
   Image,
   Select,
   Tooltip,
+  FloatButton,
+  Modal,
 } from "antd";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -32,6 +34,8 @@ const StylesCRUD = () => {
   const [loading, setUploading] = useState(false);
   const [styles, setStyles] = useState([]);
   const searchRef = useRef(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
 
   useEffect(() => {
     onSearch(".*");
@@ -49,6 +53,10 @@ const StylesCRUD = () => {
       successMessage: "Le style a bien été créé",
     });
   };
+
+  useEffect(() => {
+    form.resetFields();
+  }, [isModalVisible]);
 
   const updateStyle = (style) => {
     put(API.updateStyle + "/" + style._id, {
@@ -131,18 +139,45 @@ const StylesCRUD = () => {
           })}
         </Space>
       </Content>
-      <Footer
-        style={{
-          borderTop: "var(--border)",
+      <FloatButton
+        type={"primary"}
+        onClick={() => setIsModalVisible(true)}
+        icon={<PlusOutlined />}
+      ></FloatButton>
+      <Modal
+        open={isModalVisible}
+        onCancel={() => {
+          setIsModalVisible(false);
         }}
+        centered={true}
+        footer={[
+          <Button
+            form={"formStyles"}
+            key={"submit"}
+            htmlType={"submit"}
+            type={"primary"}
+          >
+            Ajouter
+          </Button>,
+          <Button
+            onClick={() => {
+              setIsModalVisible(false);
+            }}
+          >
+            Fermer
+          </Button>,
+        ]}
       >
         <Form
           onFinish={onFinish}
+          id={"formStyles"}
+          form={form}
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "stretch",
             justifyContent: "center",
+            paddingTop: 20,
           }}
         >
           <Form.Item
@@ -156,11 +191,8 @@ const StylesCRUD = () => {
           >
             <Input placeholder={"Nom"}></Input>
           </Form.Item>
-          <Button type="primary" htmlType="submit">
-            Ajouter un style
-          </Button>
         </Form>
-      </Footer>
+      </Modal>
     </Layout>
   );
 };

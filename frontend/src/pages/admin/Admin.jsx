@@ -147,6 +147,7 @@ const Admin = () => {
               <Routes>
                 <Route path="/albums" element={<AlbumsCRUD />} />
                 <Route path="/artistes" element={<ArtistesCRUD />} />
+                <Route path="/" element={<ArtistesCRUD />} />
                 <Route path="/musiques" element={<MusiquesCRUD />} />
                 <Route path="/styles" element={<StylesCRUD />} />
               </Routes>

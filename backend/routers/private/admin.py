@@ -1,27 +1,13 @@
 import base64
-import os
-import traceback
-from http.client import RemoteDisconnected
 from typing import Optional
-from xmlrpc.client import ProtocolError
 
 import gridfs
-import motor.motor_asyncio
-import requests
-import youtube_dl as youtube_dl
 from bson import ObjectId
 from fastapi import APIRouter, status, HTTPException, UploadFile, File
-from mutagen.wave import WAVE
 from mutagen.mp3 import MP3
 from mutagen.wave import WAVE
 from pydantic import BaseModel, Field
 from pymongo import MongoClient
-from pythumb import Thumbnail
-from pytube import YouTube
-from pytube.exceptions import VideoUnavailable, AgeRestrictedError, VideoRegionBlocked, RecordingUnavailable, \
-    VideoPrivate, LiveStreamError, MembersOnly
-from requests import ConnectTimeout
-from requests.exceptions import InvalidURL, HTTPError
 
 from backend.model.Album import AlbumModel
 from backend.model.Artist import ArtistModel
@@ -66,18 +52,6 @@ async def updateArtist(artist_id: str, artist: ArtistModel):
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Artist not updated")
 
 
-class SongDTO(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    title: str = Field(...)
-    artists: list = Field(default_factory=list)
-    album: Optional[str] = None
-    file: UploadFile = File(...)
-    duration: Optional[int] = None
-    numberPlay: Optional[int] = None
-    styles: list = Field(default_factory=list)
-    image: str = Field(...)
-    type: str = Field(...)
-
 
 @router.post("/song", )
 async def addSong(song: SongModel):
@@ -107,10 +81,9 @@ async def addSong(song: SongModel):
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not added")
 
 
-@router.put("/song/{song_id}", )
+@router.put("/songtest/{song_id}", )
 async def updateSong(song_id: str, song: UpdateSongModel):
     try:
-
         # remove attributes that are not in the model
         if song.data is not None:
             decoded_data = base64.b64decode(song.data, ' /')

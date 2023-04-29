@@ -107,7 +107,7 @@ const AlbumsCRUD = () => {
             marginTop: 30,
           }}
         >
-          {albums.map((artiste, index, array) => {
+          {albums.map((album, index, array) => {
             return (
               <Card
                 key={index}
@@ -130,42 +130,25 @@ const AlbumsCRUD = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Space
+                  <Content
                     style={{
                       display: "flex",
                       flexDirection: "row",
+                      width: "100%",
                       alignItems: "center",
+                      gap: 10,
                     }}
                   >
                     <Upload
+                      accept={"image/jpeg,image/png"}
                       className={"hover-opacity"}
                       showUploadList={false}
                       beforeUpload={(file) => {
-                        if (
-                          file.type !== "image/jpeg" &&
-                          file.type !== "image/png"
-                        ) {
-                          notification.error({
-                            message: "Erreur",
-                            description:
-                              "Le fichier doit être au format .jpg ou .png",
-                          });
-                          setUploading(false);
-                          return false;
-                        }
-                        if (file.size / 1024 / 1024 > 2) {
-                          notification.error({
-                            message: "Erreur",
-                            description: "Le fichier ne doit pas dépasser 2Mo",
-                          });
-                          setUploading(false);
-                          return false;
-                        }
                         const reader = new FileReader();
                         reader.readAsDataURL(file);
                         reader.onload = () => {
-                          artiste.image = reader.result;
-                          updateAlbum(artiste);
+                          album.image = reader.result;
+                          updateAlbum(album);
                         };
                         return false;
                       }}
@@ -179,24 +162,24 @@ const AlbumsCRUD = () => {
                           height: 50,
                           borderRadius: 5,
                         }}
-                        src={artiste.image}
+                        src={album.image}
                       />
                     </Upload>
 
                     <Text
                       editable={{
                         onChange: (value) => {
-                          artiste.title = value;
-                          updateAlbum(artiste);
+                          album.title = value;
+                          updateAlbum(album);
                         },
                       }}
                       strong
                     >
-                      {artiste.title}
+                      {album.title}
                     </Text>
                     <Select
                       mode="multiple"
-                      style={{ width: "100%" }}
+                      style={{ flex: 1 }}
                       options={artistes.map((artiste) => {
                         return {
                           value: artiste._id,
@@ -204,22 +187,22 @@ const AlbumsCRUD = () => {
                         };
                       })}
                       onChange={(value) => {
-                        artiste.artists = value;
-                        updateAlbum(artiste);
+                        album.artists = value;
+                        updateAlbum(album);
                       }}
-                      value={artiste.artists}
+                      value={album.artists}
                     ></Select>
                     <Text
                       editable={{
                         onChange: (value) => {
-                          artiste.year = value;
-                          updateAlbum(artiste);
+                          album.year = value;
+                          updateAlbum(album);
                         },
                       }}
                     >
-                      {artiste.year}
+                      {album.year}
                     </Text>
-                  </Space>
+                  </Content>
                 </Content>
               </Card>
             );

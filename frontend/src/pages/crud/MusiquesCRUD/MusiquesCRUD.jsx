@@ -273,10 +273,16 @@ const MusiquesCRUD = () => {
                         src={musique.image}
                       />
                     </Upload>
-
                     <Text
                       editable={{
                         onChange: (value) => {
+                          if (!value) {
+                            notification.error({
+                              message: "Erreur",
+                              description: "Le titre doit être renseigné",
+                            });
+                            return false;
+                          }
                           musique.title = value;
                           updateMusique(musique);
                         },
@@ -288,6 +294,31 @@ const MusiquesCRUD = () => {
                     >
                       {musique.title}
                     </Text>
+
+                    <Select
+                      mode="multiple"
+                      style={{ flex: 1 }}
+                      options={artistes.map((artist) => {
+                        console.log(artist);
+                        return {
+                          value: artist._id,
+                          label: artist.name,
+                        };
+                      })}
+                      onChange={(value) => {
+                        if (!value || value.length === 0) {
+                          notification.error({
+                            message: "Erreur",
+                            description:
+                              "Vous devez sélectionner au moins un artiste",
+                          });
+                          return false;
+                        }
+                        musique.artists = value;
+                        updateMusique(musique);
+                      }}
+                      value={musique.artists}
+                    ></Select>
                     <Select
                       style={{
                         flex: 1,
@@ -310,9 +341,9 @@ const MusiquesCRUD = () => {
                       }}
                     ></Select>
                     <Upload
+                      accept={"audio/mp3,audio/wav,audio/mpeg"}
                       showUploadList={false}
                       beforeUpload={(file) => {
-                        console.log(file);
                         //verify that type is audio
                         if (
                           file.type !== "audio/mp3" &&

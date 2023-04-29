@@ -4,6 +4,7 @@ import asyncio
 import base64
 import os
 from datetime import datetime, timedelta
+from typing import Annotated
 
 from bson import ObjectId
 from fastapi import APIRouter,status,HTTPException
@@ -120,7 +121,7 @@ async def getSongsByStyle(style_id:str):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not found")
 
 @router.get("/songid/likes", response_model=list[str])
-async def getSongsIdByLikes(x_token: str = Header("X-Token")):
+async def getSongsIdByLikes(x_token: Annotated[str,Header()]):
     try:
         payload = jwt.decode(x_token, SECRET_KEY, algorithms=[ALGORITHM])
         user = db.user.find_one({"_id": ObjectId(payload.get("sub"))})
@@ -131,7 +132,7 @@ async def getSongsIdByLikes(x_token: str = Header("X-Token")):
         print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Songs not found")
 @router.get("/song/likes", response_model=list[SongModel])
-async def getSongsByLikes(x_token: str = Header("X-Token")):
+async def getSongsByLikes(x_token: Annotated[str,Header()]):
     try:
         payload = jwt.decode(x_token, SECRET_KEY, algorithms=[ALGORITHM])
         user = db.user.find_one({"_id": ObjectId(payload.get("sub"))})
@@ -141,7 +142,7 @@ async def getSongsByLikes(x_token: str = Header("X-Token")):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Songs not found")
 @router.post("/song/like/{song_id}", response_model=list[str])
-async def likeSong(song_id:str, x_token: str = Header("X-Token")):
+async def likeSong(song_id:str,x_token: Annotated[str,Header()]):
     try:
         payload = jwt.decode(x_token, SECRET_KEY, algorithms=[ALGORITHM])
         user = db.user.find_one({"_id": ObjectId(payload.get("sub"))})
@@ -226,7 +227,7 @@ async def searchStyles(style_name:str):
         print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not found")
 @router.get("/user",response_model=UserModelOut)
-async def getUser(x_token: str = Header("X-Token")):
+async def getUser(x_token: Annotated[str,Header()]):
     try:
         payload = jwt.decode(x_token, SECRET_KEY, algorithms=[ALGORITHM])
         user = db.user.find_one({"_id": ObjectId(payload.get("sub"))},{"password":0})
