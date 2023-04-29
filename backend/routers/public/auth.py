@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-import os
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, status, HTTPException
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
-from backend.model.Style import StyleModel
 import motor.motor_asyncio
 from jose import JWTError, jwt
 

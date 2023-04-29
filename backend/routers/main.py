@@ -38,7 +38,6 @@ app.include_router(
     stream.router,
     prefix="/stream",
     tags=["app"],
-    dependencies=[Depends(dependencies.isTokenValid)],
     responses={418: {"description": "I'm a teapot"}},
 )
 @app.get("/")

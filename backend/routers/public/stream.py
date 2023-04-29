@@ -14,15 +14,17 @@ db2 = client.dlisfy
 db = MongoClient().dlisfy
 fs = gridfs.GridFS(db)
 
-
+@router.get("/")
+async def getSong():
+    return {"message": "Hello World"}
 @router.get("/song/{id}")
 async def getSongById(id: str):
+    print(id)
     file = await download_file(id)
     return StreamingResponse(file.get('file'), media_type=file.get('type'))
 
 async def chunk_generator(grid_out):
     while True:
-        # chunk = await grid_out.read(1024)
         chunk = await grid_out.readchunk()
         if not chunk:
             break

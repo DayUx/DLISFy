@@ -81,7 +81,7 @@ async def addSong(song: SongModel):
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Song not added")
 
 
-@router.put("/songtest/{song_id}", )
+@router.put("/song/{song_id}", )
 async def updateSong(song_id: str, song: UpdateSongModel):
     try:
         # remove attributes that are not in the model
