@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000/";
+const API_URL = "https://puntify-back.azurewebsites.net/";
 export const API = {
   login: API_URL + "auth/login",
   register: API_URL + "auth/register",
