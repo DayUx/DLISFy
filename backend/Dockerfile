@@ -17,7 +17,7 @@ COPY . .
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Exposez le port sur lequel l'application sera accessible
-EXPOSE 8000
+EXPOSE 443
 
 # Démarrez l'application avec uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "443"]

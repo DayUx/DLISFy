@@ -22,8 +22,8 @@ COPY . .
 
 
 # Uses port which is used by the actual application
-EXPOSE 4000
+EXPOSE 80
 
 # Run application
-CMD [ "npm","run", "preview", "--","--host", "0.0.0.0", "--port", "4000" ]
+CMD [ "npm","run", "preview", "--","--host", "0.0.0.0", "--port", "80" ]
 #CMD serve -s dist
