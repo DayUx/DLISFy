@@ -30,14 +30,13 @@ const Register = () => {
 
   const onFinish = (values) => {
     console.log("Received values of form: ", values);
-    post(
-      API.register,
-      {
+    post(API.register, {
+      body: {
         email: values.email,
         password: values.password,
         username: values.username,
       },
-      (data) => {
+      success: (data) => {
         notification.success({
           message: "Succès",
           description: "Vous êtes maintenant inscrit!",
@@ -45,8 +44,8 @@ const Register = () => {
         });
         localStorage.setItem("access_token", data.access_token);
         navigate("/");
-      }
-    );
+      },
+    });
   };
 
   return (

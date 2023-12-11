@@ -1,12 +1,10 @@
-import { Button, Card, Col, Layout, Row, Space, Typography } from "antd";
-import { CaretRightOutlined, PauseOutlined } from "@ant-design/icons";
+import { Card, Col, Row, Space, Typography } from "antd";
 import React, { useEffect, useState } from "react";
-import { AiOutlineHeart } from "react-icons/all.js";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { AiOutlineHeart } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 import Albums from "../../components/albums/Albums.jsx";
 import { get } from "../../utils/CustomRequests.jsx";
 import { API } from "../../utils/API.jsx";
-const { Text, Title, Link } = Typography;
 const Accueil = () => {
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
   const [max, setMax] = useState(5);

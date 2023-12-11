@@ -9,7 +9,7 @@ import { publish, subscribe } from "../../utils/events.jsx";
 import { API } from "../../utils/API.jsx";
 import { get } from "../../utils/CustomRequests.jsx";
 import ArtistLink from "../link/ArtistLink.jsx";
-import { BsDot } from "react-icons/all.js";
+import { BsDot } from "react-icons/bs";
 
 const Albums = ({ albums, showAll }) => {
   const [screenSize, setScreenSize] = useState(getCurrentDimension());

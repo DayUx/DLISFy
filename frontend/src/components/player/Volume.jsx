@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BsVolumeDown, BsVolumeMute, BsVolumeUp } from "react-icons/all.js";
+import { BsVolumeDown, BsVolumeMute, BsVolumeUp } from "react-icons/bs";
 import { Layout, Slider } from "antd";
 
 const { Content } = Layout;

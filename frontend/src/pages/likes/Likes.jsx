@@ -10,7 +10,7 @@ import {
   PauseOutlined,
 } from "@ant-design/icons";
 import { publish, subscribe, unsubscribe } from "../../utils/events.jsx";
-import { AiOutlineHeart } from "react-icons/all.js";
+import { AiOutlineHeart } from "react-icons/ai";
 const { Text, Title, Link } = Typography;
 
 const Likes = () => {

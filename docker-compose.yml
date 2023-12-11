@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: db
+    image: mongo
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - db_data:/data/db
+      - db_config:/data/configdb
+
+  db-express:
+    container_name: db-express
+    image: mongo-express
+    depends_on:
+      - db
+    ports:
+      - "8081:8081"
+    restart: always
+    env_file:
+      - .env
+
+  api:
+    environment:
+      - DOCKER=true
+    container_name: api
+    build: .
+    ports:
+      - "8000:8000"
+    links:
+      - db
+    depends_on:
+      - db
+    restart: always
+  front:
+    environment:
+      - DOCKER=true
+    container_name: front
+    build: ./frontend/
+    ports:
+      - "4000:4000"
+    restart: always
+
+volumes:
+  db_data:
+  db_config:
