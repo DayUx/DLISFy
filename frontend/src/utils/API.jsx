@@ -1,4 +1,9 @@
-const API_URL = "https://puntify-back.azurewebsites.net/";
+let API_URL = "/api/";
+
+if (!API_URL.endsWith("/")) {
+  API_URL += "/";
+}
+
 export const API = {
   login: API_URL + "auth/login",
   register: API_URL + "auth/register",

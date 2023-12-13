@@ -1,7 +1,9 @@
 import base64
+import os
 from typing import Optional
 
 import gridfs
+import motor.motor_asyncio
 from bson import ObjectId
 from fastapi import APIRouter, status, HTTPException, UploadFile, File
 from mutagen.mp3 import MP3
@@ -14,9 +16,16 @@ from backend.model.Artist import ArtistModel
 from backend.model.PyObjectId import PyObjectId
 from backend.model.Song import SongModel, UpdateSongModel, SongModelYoutube
 from backend.model.Style import StyleModel
+from pymongo import MongoClient
+
+
+MONGO_URL=os.getenv("MONGO_URL") or "mongodb://localhost:27017"
+SECRET_KEY=os.getenv("SECRET_KEY") or "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM=os.getenv("ALGORITHM") or "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES=os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES") or 1440
 
 router = APIRouter()
-db = MongoClient().dlisfy
+db = MongoClient(MONGO_URL).dlisfy
 fs = gridfs.GridFS(db)
 
 
@@ -30,7 +39,8 @@ async def addStyle(style: StyleModel):
     try:
         db.style.insert_one(style.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Style added")
-    except:
+    except Exception as e:
+        print(e)
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Style not added")
 
 
@@ -120,7 +130,8 @@ async def addAlbum(album: AlbumModel):
     try:
         db.album.insert_one(album.dict())
         return HTTPException(status_code=status.HTTP_201_CREATED, detail="Album added")
-    except:
+    except Exception as e:
+        print(e)
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Album not added")
 
 

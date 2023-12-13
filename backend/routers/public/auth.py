@@ -1,20 +1,21 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, status, HTTPException
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
-from pydantic import BaseModel
 import motor.motor_asyncio
-from jose import JWTError, jwt
+from fastapi import APIRouter, status, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt
+from passlib.context import CryptContext
+from pydantic import BaseModel
 
 from backend.model.User import UserModel
 
-MONGO_URL="mongodb://localhost:27017/dlisfy"
-SECRET_KEY="09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM="HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
+MONGO_URL=os.getenv("MONGO_URL") or "mongodb://localhost:27017"
+SECRET_KEY=os.getenv("SECRET_KEY") or "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM=os.getenv("ALGORITHM") or "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES=os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES") or 1440
 
 router = APIRouter()
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
