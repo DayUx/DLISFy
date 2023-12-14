@@ -40,7 +40,7 @@ services:
   puntify-front:
     environment:
       - DOCKER=true
-#      - VITE_API_URL=https://google.com/
+      - VITE_API_URL=https://localhost:443
     container_name: front
     build: ./frontend/
     image: acrpuntify.azurecr.io/puntify-front

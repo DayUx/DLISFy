@@ -19,17 +19,17 @@ resource "azurerm_resource_group" "puntifyus" {
   location = "eastus"
 }
 
-resource "azurerm_app_service_plan" "puntifyeurope" {
-  name                = "puntifyeurope-asp"
-  resource_group_name = azurerm_resource_group.puntifyeurope.name
-  location            = azurerm_resource_group.puntifyeurope.location
-  kind                = "Linux"
-  reserved            = true
-  sku {
-    tier = "Basic"
-    size = "B1"
-  }
-}
+#resource "azurerm_app_service_plan" "puntifyeurope" {
+#  name                = "puntifyeurope-asp"
+#  resource_group_name = azurerm_resource_group.puntifyeurope.name
+#  location            = azurerm_resource_group.puntifyeurope.location
+#  kind                = "Linux"
+#  reserved            = true
+#  sku {
+#    tier = "Basic"
+#    size = "B1"
+#  }
+#}
 locals {
   env_variables_europe = {
     DOCKER_REGISTRY_SERVER_URL      = "acrpuntify.azurecr.io"
@@ -86,33 +86,33 @@ resource "azurerm_cosmosdb_mongo_database" "puntifyeuropemongodb" {
   throughput          = 3000
 }
 
-
-resource "azurerm_app_service" "puntifybackeurope" {
-  name                    = "puntify-back-europe"
-  location                = azurerm_resource_group.puntifyeurope.location
-  resource_group_name     = azurerm_resource_group.puntifyeurope.name
-  app_service_plan_id     = azurerm_app_service_plan.puntifyeurope.id
-  https_only              = true
-  client_affinity_enabled = true
-  site_config {
-    scm_type          = "VSTSRM"
-    always_on         = true
-    health_check_path = "/health"
-    # health check required in order that internal app service plan loadbalancer do not loadbalance on instance down
-    linux_fx_version  = "DOCKER|acrpuntify.azurecr.io/puntify-api:latest"
-  }
-
-  logs {
-    http_logs {
-      file_system {
-        retention_in_days = 30
-        retention_in_mb   = 30
-      }
-    }
-  }
-
-  app_settings = local.env_variables_europe
-}
+#
+#resource "azurerm_app_service" "puntifybackeurope" {
+#  name                    = "puntify-back-europe"
+#  location                = azurerm_resource_group.puntifyeurope.location
+#  resource_group_name     = azurerm_resource_group.puntifyeurope.name
+#  app_service_plan_id     = azurerm_app_service_plan.puntifyeurope.id
+#  https_only              = true
+#  client_affinity_enabled = true
+#  site_config {
+#    scm_type          = "VSTSRM"
+#    always_on         = true
+#    health_check_path = "/health"
+#    # health check required in order that internal app service plan loadbalancer do not loadbalance on instance down
+#    linux_fx_version  = "DOCKER|acrpuntify.azurecr.io/puntify-api:latest"
+#  }
+#
+#  logs {
+#    http_logs {
+#      file_system {
+#        retention_in_days = 30
+#        retention_in_mb   = 30
+#      }
+#    }
+#  }
+#
+#  app_settings = local.env_variables_europe
+#}
 
 
 resource "azurerm_log_analytics_workspace" "puntifyeuropeloganalytics" {
@@ -167,8 +167,8 @@ resource "azurerm_container_app" "puntifybackeurope" {
     external_enabled           = true
     target_port                = 443
     traffic_weight {
-          latest_revision           = true
-      percentage = 100
+      latest_revision = true
+      percentage      = 100
     }
   }
   registry {
@@ -198,7 +198,7 @@ resource "azurerm_container_app" "puntifyfronteurope" {
       memory = "0.5Gi"
       env {
         name  = "VITE_API_URL"
-        value =  "https://${azurerm_container_app.puntifybackeurope.ingress[0].fqdn}"
+        value = "https://${azurerm_container_app.puntifybackeurope.ingress[0].fqdn}"
       }
     }
   }
@@ -208,11 +208,12 @@ resource "azurerm_container_app" "puntifyfronteurope" {
     external_enabled           = true
     target_port                = 80
     traffic_weight {
-          latest_revision           = true
+      latest_revision = true
 
       percentage = 100
     }
   }
+
   registry {
     server               = local.env_variables_europe.DOCKER_REGISTRY_SERVER_URL
     username             = local.env_variables_europe.DOCKER_REGISTRY_SERVER_USERNAME
@@ -227,7 +228,56 @@ resource "azurerm_container_app" "puntifyfronteurope" {
 output "test" {
   value = "https://${azurerm_container_app.puntifybackeurope.ingress[0].fqdn}"
 }
+resource "azurerm_resource_group" "punifyfrontdoorresourcegroup" {
+  location = "westeurope"
+  name     = "puntify-front-door-resource-group"
+}
 
 
+resource "azurerm_frontdoor" "puntifyfrontdoor" {
+  name                = "puntify"
+  resource_group_name = azurerm_resource_group.punifyfrontdoorresourcegroup.name
+  backend_pool_load_balancing {
+    name = "votingDemoLoadBalancingSettings1"
+
+  }
+
+  backend_pool_health_probe {
+    name     = "votingDemoHealthProbeSetting1"
+    protocol = "Https"
+  }
+  backend_pool {
+    name = "puntify-back-pool"
+
+    backend {
+      address     = azurerm_container_app.puntifyfronteurope.ingress[0].fqdn
+      http_port   = 80
+      https_port  = 443
+      host_header = azurerm_container_app.puntifyfronteurope.ingress[0].fqdn
+    }
+    load_balancing_name = "votingDemoLoadBalancingSettings1"
+    health_probe_name   = "votingDemoHealthProbeSetting1"
+  }
+  routing_rule {
+    name               = "puntify-routing-rule"
+    frontend_endpoints = ["puntify"]
+    accepted_protocols = ["Http", "Https"]
+    patterns_to_match  = ["/*"]
+    forwarding_configuration {
+      forwarding_protocol                   = "HttpsOnly"
+      backend_pool_name                     = "puntify-back-pool"
+      cache_enabled                         = true
+      cache_query_parameter_strip_directive = "StripNone"
+      cache_use_dynamic_compression         = true
+    }
+  }
+  frontend_endpoint {
+    name                         = "puntify"
+    host_name                    = "puntify.azurefd.net"
+    # Update with your custom domain
+    session_affinity_enabled     = false
+    session_affinity_ttl_seconds = 0
+  }
+}
 
 
