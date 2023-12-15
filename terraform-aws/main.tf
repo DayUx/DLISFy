@@ -1,6 +1,7 @@
 provider "aws" {
   region     = "eu-north-1"
-
+  access_key = "AKIA4Y4E7AI5G7XNZOHM"
+  secret_key = "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"
 }
 
 resource "aws_vpc" "myvpc" {
@@ -87,12 +88,13 @@ resource "aws_eip" "myeip" {
 
 resource "aws_nat_gateway" "myng" {
   allocation_id = aws_eip.myeip.id
-  subnet_id     = aws_subnet.private_subnet_1a.id
+  subnet_id     = aws_subnet.public_subnet_1a.id
   tags          = {
     Name = "MyNatGateway"
   }
   depends_on = [aws_internet_gateway.myigw]
 }
+
 
 
 resource "aws_route_table" "private_route_table" {
@@ -111,13 +113,6 @@ resource "aws_route_table" "private_route_table" {
     gateway_id = "local"
   }
 }
-
-
-
-
-
-
-
 
 
 resource "aws_route_table_association" "private_route_table_association_1" {
@@ -143,7 +138,22 @@ resource "aws_lb_target_group" "mytg" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.myvpc.id
+
 }
+
+
+resource "aws_lb_target_group_attachment" "mytg_attachment_1" {
+  target_group_arn = aws_lb_target_group.mytg.arn
+  target_id        = aws_instance.app1.id
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "mytg_attachment_2" {
+  target_group_arn = aws_lb_target_group.mytg.arn
+  target_id        = aws_instance.app2.id
+  port             = 80
+}
+
 
 resource "aws_lb_listener" "mylistener" {
   load_balancer_arn = aws_lb.myalb.arn
@@ -188,14 +198,12 @@ resource "aws_security_group" "bastion" {
   ingress {
     from_port       = 80
     to_port         = 80
-    #    type        = "http"
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
   ingress {
     from_port       = 443
     to_port         = 443
-    #    type        = "https"
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
@@ -219,6 +227,30 @@ resource "aws_security_group" "bastion" {
 #  security_groups = [aws_security_group.bastion.id]
 #}
 
+
+
+locals {
+  user_data = <<-EOF
+#!/bin/bash
+sudo dnf update
+sudo dnf install -y docker git
+wget https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)
+sudo mv docker-compose-$(uname -s)-$(uname -m) /usr/local/bin/docker-compose
+sudo chmod -v +x /usr/local/bin/docker-compose
+sudo systemctl start docker.service
+sudo systemctl enable docker
+sudo systemctl status docker
+sudo usermod -a -G docker ec2-user
+newgrp docker
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+git clone https://github.com/DayUx/puntify.git
+cd puntify
+docker-compose up -d
+EOF
+
+}
+
 resource "aws_instance" "app1" {
   ami                    = "ami-0416c18e75bd69567"
   instance_type          = "t3.micro"
@@ -235,30 +267,7 @@ resource "aws_instance" "app1" {
   ]
 
 
-  user_data = <<-EOF
-#!/bin/bash
-sudo dnf update
-sudo dnf install -y docker git
-wget https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)
-sudo mv docker-compose-$(uname -s)-$(uname -m) /usr/local/bin/docker-compose
-sudo chmod -v +x /usr/local/bin/docker-compose
-sudo systemctl start docker.service
-sudo systemctl enable docker
-sudo systemctl status docker
-sudo usermod -a -G docker ec2-user
-newgrp docker
-sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Clone the Git repository
-git clone https://github.com/DayUx/puntify.git
-
-# Change to the cloned directory
-cd puntify
-
-# Build and start the Docker Compose services
-docker-compose up -d
-EOF
+  user_data = local.user_data
 
 }
 
@@ -275,27 +284,5 @@ resource "aws_instance" "app2" {
     aws_nat_gateway.myng,
     aws_route_table.private_route_table
   ]
-
-
-
-
-  user_data = <<-EOF
-#!/bin/bash
-sudo dnf update
-sudo dnf install -y docker git
-wget https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)
-sudo mv docker-compose-$(uname -s)-$(uname -m) /usr/local/bin/docker-compose
-sudo chmod -v +x /usr/local/bin/docker-compose
-sudo systemctl start docker.service
-sudo systemctl enable docker
-sudo systemctl status docker
-sudo usermod -a -G docker ec2-user
-newgrp docker
-sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-git clone https://github.com/DayUx/puntify.git
-cd puntify
-docker-compose up -d
-EOF
-
+  user_data = local.user_data
 }

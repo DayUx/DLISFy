@@ -1,32 +1,35 @@
 version: '3.8'
 
 services:
-#  db:
-#    container_name: db
-#    image: mongo
-#    env_file:
-#      - .env
-#    restart: always
-#    ports:
-#      - "27017:27017"
-#    volumes:
-#      - db_data:/data/db
-#      - db_config:/data/configdb
-#
-#  db-express:
-#    container_name: db-express
-#    image: mongo-express
-#    depends_on:
-#      - db
-#    ports:
-#      - "8081:8081"
-#    restart: always
-#    env_file:
-#      - .env
+  db:
+    container_name: db
+    image: mongo
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - db_data:/data/db
+      - db_config:/data/configdb
+    networks:
+      - bridge
+
+  db-express:
+    container_name: db-express
+    image: mongo-express
+    depends_on:
+      - db
+    ports:
+      - "8081:8081"
+    restart: always
+    env_file:
+      - .env
 
   puntify-api:
     environment:
       - DOCKER=true
+      - MONGO_URL=mongodb://db:27017/
     container_name: api
     build: .
     image: acrpuntify.azurecr.io/puntify-api
@@ -34,10 +37,10 @@ services:
       - bridge
     ports:
       - "443:443"
-#    links:
-#      - db
-#    depends_on:
-#      - db
+    links:
+      - db
+    depends_on:
+      - db
     restart: always
   puntify-front:
     environment:
